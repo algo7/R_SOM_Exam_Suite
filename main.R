@@ -63,6 +63,7 @@ menuListT1<-c(
   'Weighted Moving Average',
   'Exponential Smoothing',
   'Linear Regression',
+  'Error Analysis & Accuracy Comparison',
   'Back'
 )
 
@@ -74,7 +75,8 @@ topicI<-function(){
           '2' = {wmaFunc();cat('\n');topicI()},
           '3' = {expSmoothFunc();cat('\n');topicI()},
           '4' = {simpRegress();cat('\n');topicI()},
-          '5'=topicSelect()
+          '5' = {errAAC();cat('\n');topicI()},
+          '6'=topicSelect()
   )
 }
 
@@ -102,6 +104,7 @@ smaFunc<-function(){
 
   # Return the predicted column for error analysis
   return(df[as.character(smaColName)])
+
 }
 
 wmaFunc<-function(){
@@ -220,7 +223,21 @@ simpRegress<-function(){
 
 }
 
+errAAC<-function(){
+  # Import the file
+  x<-fileImport(TRUE)
+  #Convert it to df
+  df<-data.frame(x)
+  # Get the result of each type of prediction methods
+  smaRes<-smaFunc()
+  wmaRes<-wmaFunc()
+  expSmoothRes<-expSmoothFunc()
+  simpRegressRes<-simpRegress()
+  # Combind all the results with the original value
+  tRes<-cbind(df['X.t.'],smaRes,wmaRes,expSmoothRes,simpRegressRes)
+  tRes[2:length(tRes)]-
 
+}
 
 
 
