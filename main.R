@@ -4,7 +4,6 @@ library(cli)
 library(stringr)
 library(lpSolve)
 library(TTR)
-library(AnalyzeTS)
 
 # Misc.:
 
@@ -71,10 +70,10 @@ menuListT1<-c(
 topicI<-function(){
   choice<-menu(menuListT1,title='What do you need?')
   switch (choice,
-          '1' = {smaFunc(); cat('\n');topicI()},
+          '1' = {smaFunc();cat('\n');topicI()},
           '2' = {wmaFunc();cat('\n');topicI()},
-          '3' = {expSmoothFunc();cat('\n');topicI()}
-          '4' = {simpRegress();cat('\n');topicI()}
+          '3' = {expSmoothFunc();cat('\n');topicI()},
+          '4' = {simpRegress();cat('\n');topicI()},
           '5'=topicSelect()
   )
 }
@@ -157,6 +156,55 @@ expSmoothFunc<-function(){
 }
 
 simpRegress<-function(){
+  # Import the file
+  x<-fileImport(TRUE)
+  #Convert it to df
+  df<-data.frame(x)
+  # Extract the time and the value columns
+  timeCol<-colnames(df['t'])
+  valCol<-colnames(df['X.t.'])
+  # Formula Selection Function
+  regFormSelect<-function(){
+    formlula<-character()
+    regFormMenu<-c(
+      opt1<-paste(timeCol,'=','a + b *',valCol),
+      opt2<-paste(valCol,'=','a + b *',timeCol)
+    );
+    choice<-menu(regFormMenu,title='Select Relationship Type: ')
+    switch (choice,
+            '1' = formlula<-c(opt1,timeCol,valCol),
+            '2' = formlula<-c(opt2,valCol,timeCol)
+    )
+  }
+  formula<-regFormSelect()
+  # The regression formula
+  formulaF<-as.formula(paste(formula[2],formula[3],sep = '~'))
+  # Generate the model
+  lmod<-lm(formulaF,df)
+  # The summary
+  slmod<-summary(lmod)
+  # The coefficients
+  slmodc<-slmod$coefficients
+  # The final formulas
+  textForm<-paste(formula[2],'=',slmodc[formula[3],'Estimate'],'*',formula[3],'+',slmodc['(Intercept)','Estimate'])
+  varForm<-
+    paste(formula[2],'=',slmodc[formula[3],'Estimate'],'x','+',slmodc['(Intercept)','Estimate'])
+  # The predicted Values | lmod$fitted.values is missing the last value
+  predictedVals<-df['t']*slmodc[formula[3],'Estimate']+slmodc['(Intercept)','Estimate']
+  colnames(predictedVals)<-NULL
+  # Update the df with the LR data
+  df<-cbind(df,Temp=predictedVals)
+  # Replace the col. names
+  colnames(df)[colnames(df)=='Temp']<-'LR'
+
+  # Print the result
+  cli_alert_success('Forecasted: ')
+  cat('\n')
+  print(df)
+  cat('\n')
+  cli_alert_info('Formulas: ')
+  print(paste('Formula (text):',textForm))
+  print(paste('Formula (variable):',varForm))
 
 }
 
