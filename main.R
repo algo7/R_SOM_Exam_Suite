@@ -63,6 +63,7 @@ menuListT1<-c(
   'Simple Moving Average',
   'Weighted Moving Average',
   'Exponential Smoothing',
+  'Linear Regression',
   'Back'
 )
 
@@ -73,7 +74,8 @@ topicI<-function(){
           '1' = {smaFunc(); cat('\n');topicI()},
           '2' = {wmaFunc();cat('\n');topicI()},
           '3' = {expSmoothFunc();cat('\n');topicI()}
-          '4'=topicSelect()
+          '4' = {simpRegress();cat('\n');topicI()}
+          '5'=topicSelect()
   )
 }
 
@@ -151,6 +153,10 @@ expSmoothFunc<-function(){
   cat('\n')
   print(df)
   cat('\n')
+
+}
+
+simpRegress<-function(){
 
 }
 
