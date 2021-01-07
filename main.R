@@ -72,7 +72,7 @@ topicI<-function(){
   choice<-menu(menuListT1,title='What do you need?')
   switch (choice,
           '1' = {smaFunc(); cat('\n');topicI()},
-          '2' = {;cat('\n');topicI()},
+          '2' = {wmaFunc();cat('\n');topicI()},
           '3'=topicSelect()
   )
 }
@@ -92,6 +92,31 @@ smaFunc<-function(){
   df<-cbind(df,Temp=c(NA,smaVal))
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-smaColName
+
+  # Print the result
+  cli_alert_success('Forecasted: ')
+  cat('\n')
+  print(df)
+  cat('\n')
+}
+
+wmaFunc<-function(){
+  # Import the file
+  x<-fileImport(TRUE)
+  #Convert it to df
+  df<-data.frame(x)
+  # Ask for the period to forecast
+  wmaPeriod<-toInt(inpSplit('Period for WMA e.g.(3,5): '))
+  # Ask for the weights (must sum up to one)
+  wmaWts<-toInt(inpSplit('Weights for WMA e.g.(0.3,0.5). Enter them as Given, the Program will Reverse them for You: '))
+  # Calculate the wma for the given period
+  wmaVal<-WMA(na.omit(df[,'X.t.']),n=wmaPeriod,wts=rev(wmaWts))
+  # Generate the col. name for the wma
+  wmaColName<-paste('WMA.',wmaPeriod,sep='')
+  # Update the df with the wma
+  df<-cbind(df,Temp=c(NA,wmaVal))
+  # Replace the col. names
+  colnames(df)[colnames(df)=='Temp']<-wmaColName
 
   # Print the result
   cli_alert_success('Forecasted: ')
