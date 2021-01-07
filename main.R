@@ -433,11 +433,42 @@ avgDailyIndex<-function(printYes){
 }
 
 
+# Topic 2 (Probability Distribution)
+# Main Menu List
+menuListT2<-c(
+  'Simple Moving Average',
+  'Weighted Moving Average',
+  'Exponential Smoothing',
+  'Linear Regression',
+  'Error Analysis & Accuracy Comparison',
+  'Average Daily Index [Col. No. Must be a Multiple of 7]',
+  'Back'
+)
+
+# Topic II menu
+topicI<-function(){
+  choice<-menu(menuListT2,title='What do you need?')
+  switch (choice,
+          '1' = {smaFunc(TRUE);cat('\n');topicI()},
+          '2' = {wmaFunc(TRUE);cat('\n');topicI()},
+          '3' = {expSmoothFunc(TRUE);cat('\n');topicI()},
+          '4' = {simpRegress(TRUE);cat('\n');topicI()},
+          '5' = {errAAC(TRUE);cat('\n');topicI()},
+          '6' = {avgDailyIndex(TRUE);cat('\n');topicI()},
+          '7' = topicSelect()
+  )
+}
+
+
+
+
+
 
 # Main Menu Selection Function
 topicSelect=function(){
   menuList<-c(
-    'Forecasting'
+    'Forecasting',
+    'Probability Distribution'
   );
 
   choice<-menu(menuList, title='Please Select A Topic:');
@@ -445,6 +476,7 @@ topicSelect=function(){
   mSelect<-function(topic){
     switch (topic,
             '1' = topicI(),
+            '2' = topicII()
     )
   };
   mSelect(choice);
