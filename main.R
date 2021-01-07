@@ -99,6 +99,9 @@ smaFunc<-function(){
   cat('\n')
   print(df)
   cat('\n')
+
+  # Return the predicted column for error analysis
+  return(df[as.character(smaColName)])
 }
 
 wmaFunc<-function(){
@@ -124,6 +127,9 @@ wmaFunc<-function(){
   cat('\n')
   print(df)
   cat('\n')
+
+  # Return the predicted column for error analysis
+  return(df[as.character(wmaColName)])
 }
 
 expSmoothFunc<-function(){
@@ -152,6 +158,9 @@ expSmoothFunc<-function(){
   cat('\n')
   print(df)
   cat('\n')
+
+  # Return the predicted column for error analysis
+  return(df['SES'])
 
 }
 
@@ -205,6 +214,9 @@ simpRegress<-function(){
   cli_alert_info('Formulas: ')
   print(paste('Formula (text):',textForm))
   print(paste('Formula (variable):',varForm))
+
+  # Return the predicted column for error analysis
+  return(df['LR'])
 
 }
 
