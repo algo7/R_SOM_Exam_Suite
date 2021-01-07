@@ -64,6 +64,7 @@ menuListT1<-c(
   'Exponential Smoothing',
   'Linear Regression',
   'Error Analysis & Accuracy Comparison',
+  'Average Daily Index',
   'Back'
 )
 
@@ -71,16 +72,17 @@ menuListT1<-c(
 topicI<-function(){
   choice<-menu(menuListT1,title='What do you need?')
   switch (choice,
-          '1' = {smaFunc();cat('\n');topicI()},
-          '2' = {wmaFunc();cat('\n');topicI()},
-          '3' = {expSmoothFunc();cat('\n');topicI()},
-          '4' = {simpRegress();cat('\n');topicI()},
-          '5' = {errAAC();cat('\n');topicI()},
-          '6'=topicSelect()
+          '1' = {smaFunc(TRUE);cat('\n');topicI()},
+          '2' = {wmaFunc(TRUE);cat('\n');topicI()},
+          '3' = {expSmoothFunc(TRUE);cat('\n');topicI()},
+          '4' = {simpRegress(TRUE);cat('\n');topicI()},
+          '5' = {errAAC(TRUE);cat('\n');topicI()},
+          '6' = {avgDailyIndex();cat('\n');topicI()},
+          '7' = topicSelect()
   )
 }
 
-smaFunc<-function(){
+smaFunc<-function(printYes){
   # Import the file
   x<-fileImport(TRUE)
   #Convert it to df
@@ -96,18 +98,20 @@ smaFunc<-function(){
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-smaColName
 
-  # Print the result
-  cli_alert_success('Forecasted: ')
-  cat('\n')
-  print(df)
-  cat('\n')
+  if(printYes==TRUE){
+    # Print the result
+    cli_alert_success('Forecasted: ')
+    cat('\n')
+    print(df)
+    cat('\n')
+  }
 
   # Return the predicted column for error analysis
   return(df[as.character(smaColName)])
 
 }
 
-wmaFunc<-function(){
+wmaFunc<-function(printYes){
   # Import the file
   x<-fileImport(TRUE)
   #Convert it to df
@@ -125,17 +129,19 @@ wmaFunc<-function(){
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-wmaColName
 
-  # Print the result
-  cli_alert_success('Forecasted: ')
-  cat('\n')
-  print(df)
-  cat('\n')
+  if(printYes==TRUE){
+    # Print the result
+    cli_alert_success('Forecasted: ')
+    cat('\n')
+    print(df)
+    cat('\n')
+  }
 
   # Return the predicted column for error analysis
   return(df[as.character(wmaColName)])
 }
 
-expSmoothFunc<-function(){
+expSmoothFunc<-function(printYes){
   # Import the file
   x<-fileImport(TRUE)
   #Convert it to df
@@ -156,18 +162,20 @@ expSmoothFunc<-function(){
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-sesColName
 
-  # Print the result
-  cli_alert_success('Forecasted: ')
-  cat('\n')
-  print(df)
-  cat('\n')
+  if(printYes==TRUE){
+    # Print the result
+    cli_alert_success('Forecasted: ')
+    cat('\n')
+    print(df)
+    cat('\n')
+  }
 
   # Return the predicted column for error analysis
   return(df['SES'])
 
 }
 
-simpRegress<-function(){
+simpRegress<-function(printYes){
   # Import the file
   x<-fileImport(TRUE)
   #Convert it to df
@@ -209,30 +217,32 @@ simpRegress<-function(){
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-'LR'
 
-  # Print the result
-  cli_alert_success('Forecasted: ')
-  cat('\n')
-  print(df)
-  cat('\n')
-  cli_alert_info('Formulas: ')
-  print(paste('Formula (text):',textForm))
-  print(paste('Formula (variable):',varForm))
+  if(printYes==TRUE){
+    # Print the result
+    cli_alert_success('Forecasted: ')
+    cat('\n')
+    print(df)
+    cat('\n')
+    cli_alert_info('Formulas: ')
+    print(paste('Formula (text):',textForm))
+    print(paste('Formula (variable):',varForm))
+  }
 
   # Return the predicted column for error analysis
   return(df['LR'])
 
 }
 
-errAAC<-function(){
+errAAC<-function(printYes){
   # Import the file
   x<-fileImport(TRUE)
   #Convert it to df
   df<-data.frame(x)
   # Get the result of each type of prediction methods
-  smaRes<-smaFunc()
-  wmaRes<-wmaFunc()
-  expSmoothRes<-expSmoothFunc()
-  simpRegressRes<-simpRegress()
+  smaRes<-smaFunc(FALSE)
+  wmaRes<-wmaFunc(FALSE)
+  expSmoothRes<-expSmoothFunc(FALSE)
+  simpRegressRes<-simpRegress(FALSE)
   # Combind all the results with the original value
   tRes<-cbind(df['X.t.'],smaRes,wmaRes,expSmoothRes,simpRegressRes)
   # Extract the err df
@@ -250,17 +260,54 @@ errAAC<-function(){
   # Most accurate method
   bestMethod<-colnames(errDfFinal)[which(errDfFinal[2,]==min(errDfFinal))]
 
-  # Print the result
-  cat('\n')
-  cli_alert_success('Results: ')
-  cat('\n')
-  print(errDfFinal)
-  cat('\n')
-  print(paste('Most Accurate Method:',str_remove(bestMethod, '.ERR')))
-  cat('\n')
-  cli_alert_success('Original Result:')
-  print(tRes)
-  cat('\n')
+  if(printYes==TRUE){
+    # Print the result
+    cat('\n')
+    cli_alert_success('Results: ')
+    cat('\n')
+    print(errDfFinal)
+    cat('\n')
+    print(paste('Most Accurate Method:',str_remove(bestMethod, '.ERR')))
+    cat('\n')
+    cli_alert_success('Original Result:')
+    print(tRes)
+    cat('\n')
+  }
+
+  # Return Err. df for analysis
+  return(errDfFinal)
+
+}
+
+avgDailyIndex<-function(){
+
+  # Prediction Methods List
+  predMenu<-c(
+    'Simple Moving Average',
+    'Weighted Moving Average',
+    'Exponential Smoothing',
+    'Linear Regression'
+  )
+
+  # Prediction Methods Menu
+  predSelect<-function(){
+    choice<-menu(predMenu,title='Which Method do You Want to Use?')
+    switch (choice,
+            '1' = return(smaFunc(FALSE)),
+            '2' = return(wmaFunc(FALSE)),
+            '3' = return(expSmoothFunc(FALSE)),
+            '4' = return(simpRegress(FALSE))
+    )
+  }
+  # Get the predicted vals from the selected optimization methods
+  predictedVal<-predSelect()
+
+  # Import the file
+  x<-fileImport(TRUE)
+  # Convert it to df
+  df<-data.frame(x)
+  # Add the predicted result
+
 
 }
 
