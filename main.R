@@ -258,6 +258,9 @@ errAAC<-function(){
   cat('\n')
   print(paste('Most Accurate Method:',str_remove(bestMethod, '.ERR')))
   cat('\n')
+  cli_alert_success('Original Result:')
+  print(tRes)
+  cat('\n')
 
 }
 
