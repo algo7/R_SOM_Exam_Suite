@@ -11,11 +11,8 @@ library(TTR)
 fileImport<-function(header){
   # Import the file
   filex<-file.choose()
-  # Fix newline problem
-  cat("\n", file = filex, append = TRUE)
   # Read the file as CSV
   x<-read.csv(file=filex,header = header)
-
   return (x)
 }
 
@@ -64,6 +61,7 @@ cli::cat_boxx(welcomeMsg)
 menuListT1<-c(
   'Simple Moving Average',
   'Weighted Moving Average',
+  'Exponential Smoothing',
   'Back'
 )
 
@@ -73,7 +71,8 @@ topicI<-function(){
   switch (choice,
           '1' = {smaFunc(); cat('\n');topicI()},
           '2' = {wmaFunc();cat('\n');topicI()},
-          '3'=topicSelect()
+          '3' = {expSmoothFunc();cat('\n');topicI()}
+          '4'=topicSelect()
   )
 }
 
@@ -117,6 +116,30 @@ wmaFunc<-function(){
   df<-cbind(df,Temp=c(NA,wmaVal))
   # Replace the col. names
   colnames(df)[colnames(df)=='Temp']<-wmaColName
+
+  # Print the result
+  cli_alert_success('Forecasted: ')
+  cat('\n')
+  print(df)
+  cat('\n')
+}
+
+expSmoothFunc<-function(){
+  # Import the file
+  x<-fileImport(TRUE)
+  #Convert it to df
+  df<-data.frame(x)
+  # Ask for the alpha val.
+  emaRatio<-toInt(inpSplit('Alpha for EMA e.g.(0.3,0.5): '))
+  emaRatio<-c(emaRatio[1],1-emaRatio[1])
+  # Calculate the ema for the given alpha
+  emaVal<-EMA(na.omit(df[,'X.t.']),ratio=emaRatio)
+  # Generate the col. name for the ema
+  emaColName<-paste('EMA.',wmaPeriod,sep='')
+  # Update the df with the ema | first forecast = last observation
+  df<-cbind(df,Temp=c(df[,'X.t.'][1],emaVal))
+  # Replace the col. names
+  colnames(df)[colnames(df)=='Temp']<-emaColName
 
   # Print the result
   cli_alert_success('Forecasted: ')
