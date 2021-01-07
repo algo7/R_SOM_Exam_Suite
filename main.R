@@ -307,33 +307,92 @@ avgDailyIndex<-function(printYes){
   df<-data.frame(x)
   # Add the predicted result
   df<-cbind(df,predictedVal)
-  # Get the index of the first NA val., which indicates today
+  # Get the index of the first NA val., which indicates today / this month
   todayIndex<-which(is.na(df[,'X.t.']))[1]-1
-  # Range of existing data (no forecast)
+  # Range of existing data (no forecast | current observation)
   exiDR<-c(1:todayIndex)
   # Calculate the daily index
   dailyIndex<-(df[,'X.t.'][exiDR]-df[,'LR'][exiDR])/df[,'LR'][exiDR]
   # Convert it to df
   dailyIndex<-data.frame(dailyIndex)
+  # Padding
   dailyIndex[(todayIndex+1):length(df[,'t']),]<-NA
-  # Bind the dailyIndex into the df
-  df<-cbind(df,dailyIndex)
-  # Create the avg. daily index table
-  avgDIMat<-matrix(NA, nrow=7,ncol=1)
-  # Convert it to df
-  avgDIMat<-data.frame(avgDIMat)
-  # Assign row & col. names
-  colnames(avgDIMat)<-c('Avg.Daily.Index')
-  rownames(avgDIMat)<-c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-  # Cal. the avg.
-  for (i in 1:length(rownames(avgDIMat))) {
-    # Find the index of each re-occurring weekdays
-    index<-which(df[,'Day'][exiDR]==rownames(avgDIMat)[i])
-    # Update the avg. daily index df
-    avgDIMat[,'Avg.Daily.Index'][i]<-mean(df[,'dailyIndex'][index])
+
+  # Date / Month Switch
+  monthDaySwitch<-toInt(inpSplit('Is the Cycle Month=1 or Date=2: '))
+
+  if(monthDaySwitch==1){
+    # Bind the dailyIndex into the df & re-name the col.
+    colnames(dailyIndex)<-NULL
+    df<-cbind(df,monthlyIndex=dailyIndex)
+    # Create the avg. monthly index table
+    avgMIMat<-matrix(NA, nrow=12,ncol=1)
+    # Convert it to df
+    avgMIMat<-data.frame(avgMIMat)
+    # Assign row & col. names
+    colnames(avgMIMat)<-c('Avg.Monthly.Index')
+    rownames(avgMIMat)<-c('January','February','March','April','May','June','July','August','September','October','November','December')
+    # Cal. the avg.
+    for (i in 1:length(rownames(avgMIMat))) {
+      # Find the index of each re-occurring weekdays
+      index<-which(df[,'Month'][exiDR]==rownames(avgMIMat)[i])
+      # Update the avg. daily index df
+      avgMIMat[,'Avg.Monthly.Index'][i]<-mean(df[,'monthlyIndex'][index])
+
+    }
+    # Cal. LR+SI
+    tempSI<-data.frame(rep.int(unlist(avgMIMat[1]),ceiling(length(df[,1])/12)))
+    # Calculate the length diff
+    lTempSI<-length(tempSI[,1])
+    lDiff<-lTempSI-length(df[,'t'])
+    # tempSI is longer than the df
+    if(sign(lDiff)==1){
+      lDiff<-lDiff-1
+      tempSI<-data.frame(tempSI[,1][-((lTempSI-lDiff):lTempSI)])
+
+    # tempSI is shorter than the df
+    }else if(sign(lDiff)==-1){
+      paddings<-unlist(avgMIMat[1])[1:abs(lDiff)]
+      tempSI[lTempSI:length(df[,'t']),]<-as.numeric(paddings)
+    }
+    # tempSI[(todayIndex+1):length(df[,'t']),]<-NA
+
+
+  }else{
+    # Bind the dailyIndex into the df
+    df<-cbind(df,dailyIndex)
+    # Create the avg. daily index table
+    avgDIMat<-matrix(NA, nrow=7,ncol=1)
+    # Convert it to df
+    avgDIMat<-data.frame(avgDIMat)
+    # Assign row & col. names
+    colnames(avgDIMat)<-c('Avg.Daily.Index')
+    rownames(avgDIMat)<-
+      c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    # Cal. the avg.
+    for (i in 1:length(rownames(avgDIMat))) {
+      # Find the index of each re-occurring weekdays
+      index<-which(df[,'Day'][exiDR]==rownames(avgDIMat)[i])
+      # Update the avg. daily index df
+      avgDIMat[,'Avg.Daily.Index'][i]<-mean(df[,'dailyIndex'][index])
+    }
+    # Cal. LR+SI
+    tempSI<-data.frame(rep.int(unlist(avgDIMat[1]),length(df[,1])/7))
+    # Calculate the length diff
+    lTempSI<-length(tempSI[,1])
+    lDiff<-lTempSI-length(df[,'t'])
+    # tempSI is longer than the df
+    if(sign(lDiff)==1){
+      lDiff<-lDiff-1
+      tempSI<-data.frame(tempSI[,1][-((lTempSI-lDiff):lTempSI)])
+      # tempSI is shorter than the df
+    }else if(sign(lDiff)==-1){
+      paddings<-unlist(avgDIMat[1])[1:abs(lDiff)]
+      tempSI[lTempSI:length(df[,'t']),]<-as.numeric(paddings)
+    }
+
   }
-  # Cal. LR+SI
-  tempSI<-data.frame(rep.int(unlist(avgDIMat[1]),length(df[,1])/7))
+
   colnames(tempSI)<-NULL
   # Bind the SI into the df
   df<-cbind(df,tempSI=tempSI)
