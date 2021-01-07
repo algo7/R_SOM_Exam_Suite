@@ -64,7 +64,7 @@ menuListT1<-c(
   'Exponential Smoothing',
   'Linear Regression',
   'Error Analysis & Accuracy Comparison',
-  'Average Daily Index',
+  'Average Daily Index [Col. No. Must be a Multiple of 7]',
   'Back'
 )
 
@@ -77,7 +77,7 @@ topicI<-function(){
           '3' = {expSmoothFunc(TRUE);cat('\n');topicI()},
           '4' = {simpRegress(TRUE);cat('\n');topicI()},
           '5' = {errAAC(TRUE);cat('\n');topicI()},
-          '6' = {avgDailyIndex();cat('\n');topicI()},
+          '6' = {avgDailyIndex(TRUE);cat('\n');topicI()},
           '7' = topicSelect()
   )
 }
@@ -279,7 +279,7 @@ errAAC<-function(printYes){
 
 }
 
-avgDailyIndex<-function(){
+avgDailyIndex<-function(printYes){
 
   # Prediction Methods List
   predMenu<-c(
@@ -301,12 +301,74 @@ avgDailyIndex<-function(){
   }
   # Get the predicted vals from the selected optimization methods
   predictedVal<-predSelect()
-
   # Import the file
   x<-fileImport(TRUE)
   # Convert it to df
   df<-data.frame(x)
   # Add the predicted result
+  df<-cbind(df,predictedVal)
+  # Get the index of the first NA val., which indicates today
+  todayIndex<-which(is.na(df[,'X.t.']))[1]-1
+  # Range of existing data (no forecast)
+  exiDR<-c(1:todayIndex)
+  # Calculate the daily index
+  dailyIndex<-(df[,'X.t.'][exiDR]-df[,'LR'][exiDR])/df[,'LR'][exiDR]
+  # Convert it to df
+  dailyIndex<-data.frame(dailyIndex)
+  dailyIndex[(todayIndex+1):length(df[,'t']),]<-NA
+  # Bind the dailyIndex into the df
+  df<-cbind(df,dailyIndex)
+  # Create the avg. daily index table
+  avgDIMat<-matrix(NA, nrow=7,ncol=1)
+  # Convert it to df
+  avgDIMat<-data.frame(avgDIMat)
+  # Assign row & col. names
+  colnames(avgDIMat)<-c('Avg.Daily.Index')
+  rownames(avgDIMat)<-c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+  # Cal. the avg.
+  for (i in 1:length(rownames(avgDIMat))) {
+    # Find the index of each re-occurring weekdays
+    index<-which(df[,'Day'][exiDR]==rownames(avgDIMat)[i])
+    # Update the avg. daily index df
+    avgDIMat[,'Avg.Daily.Index'][i]<-mean(df[,'dailyIndex'][index])
+  }
+  # Cal. LR+SI
+  tempSI<-data.frame(rep.int(unlist(avgDIMat[1]),length(df[,1])/7))
+  colnames(tempSI)<-NULL
+  # Bind the SI into the df
+  df<-cbind(df,tempSI=tempSI)
+  # Calculate LR+SI
+  df[,'tempSI']<-df[,'LR']+df[,'LR']*df[,'tempSI']
+  # Replace the col. names
+  colnames(df)[colnames(df)=='tempSI']<-'LR+SI'
+  # Cal. MSE till last observation
+  mseLR<-(df[,'LR'][exiDR]-df[,'X.t.'][exiDR])^2
+  mseLRSI<-(df[,'LR+SI'][exiDR]-df[,'X.t.'][exiDR])^2
+  # Convert to dfs
+  mseLR<-data.frame(mseLR)
+  mseLRSI<-data.frame(mseLRSI)
+  # Bind them all
+  tMSE<-cbind(mseLR,mseLRSI)
+  # Cal. ME as well
+  errDf<-rbind(colMeans(tMSE),sqrt(colMeans(tMSE)))
+  # Update the row name
+  rownames(errDf)<-c('MSE','ME')
+  # Most accurate method
+  bestMethod<-colnames(errDf)[which(errDf[2,]==min(errDf))]
+
+  if(printYes==TRUE){
+    # Print the result
+    cat('\n')
+    cli_alert_success('Results: ')
+    cat('\n')
+    print(errDf)
+    cat('\n')
+    print(paste('Most Accurate Method:',str_remove(bestMethod, '.ERR')))
+    cat('\n')
+    cli_alert_success('Original Result:')
+    print(df)
+    cat('\n')
+  }
 
 
 }
