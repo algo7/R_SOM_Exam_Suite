@@ -1,10 +1,9 @@
 #!/usr/bin/env Rscript
 # Load libraries
 library(cli)
-library(dplyr)
 library(stringr)
 library(lpSolve)
-library(boot)
+library(TTR)
 
 # Misc.:
 
@@ -57,14 +56,14 @@ lookUp<-function(val,toCompare){
 }
 
 
-
 welcomeMsg<-'Hi Welcome to the SOM Terminal by Aviv'
 cli::cat_boxx(welcomeMsg)
 
-# Topic 1 ()
+# Topic 1 (Forecasting)
 # Main Menu List
 menuListT1<-c(
-  'Test',
+  'Simple Moving Average',
+  'Weighted Moving Average',
   'Back'
 )
 
@@ -72,15 +71,45 @@ menuListT1<-c(
 topicI<-function(){
   choice<-menu(menuListT1,title='What do you need?')
   switch (choice,
-          '1' = {test(); cat("\n");topicI()},
-          '2'=topicSelect()
+          '1' = {smaFunc(); cat('\n');topicI()},
+          '2' = {;cat('\n');topicI()},
+          '3'=topicSelect()
   )
 }
+
+smaFunc<-function(){
+  # Import the file
+  x<-fileImport(TRUE)
+  #Convert it to df
+  df<-data.frame(x)
+  # Ask for the period to forecast
+  smaPeriod<-toInt(inpSplit('Period for SMA e.g.(3,5): '))
+  # Calculate the sma for the given period
+  smaVal<-SMA(na.omit(df[,'X.t.']),n=smaPeriod)
+  # Generate the col. name for the sma
+  smaColName<-paste('SMA.',smaPeriod,sep='')
+  # Update the df with the sma
+  df<-cbind(df,Temp=c(NA,smaVal))
+  # Replace the col. names
+  colnames(df)[colnames(df)=='Temp']<-smaColName
+
+  # Print the result
+  cli_alert_success('Forecasted: ')
+  cat('\n')
+  print(df)
+  cat('\n')
+}
+
+
+
+
+
+
 
 # Main Menu Selection Function
 topicSelect=function(){
   menuList<-c(
-    'Test'
+    'Forecasting'
   );
 
   choice<-menu(menuList, title='Please Select A Topic:');
@@ -91,6 +120,5 @@ topicSelect=function(){
     )
   };
   mSelect(choice);
-
 }
 topicSelect()
