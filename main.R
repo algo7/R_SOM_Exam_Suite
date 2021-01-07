@@ -4,6 +4,7 @@ library(cli)
 library(stringr)
 library(lpSolve)
 library(TTR)
+library(AnalyzeTS)
 
 # Misc.:
 
@@ -130,25 +131,28 @@ expSmoothFunc<-function(){
   #Convert it to df
   df<-data.frame(x)
   # Ask for the alpha val.
-  emaRatio<-toInt(inpSplit('Alpha for EMA e.g.(0.3,0.5): '))
-  emaRatio<-c(emaRatio[1],1-emaRatio[1])
-  # Calculate the ema for the given alpha
-  emaVal<-EMA(na.omit(df[,'X.t.']),ratio=emaRatio)
-  # Generate the col. name for the ema
-  emaColName<-paste('EMA.',wmaPeriod,sep='')
-  # Update the df with the ema | first forecast = last observation
-  df<-cbind(df,Temp=c(df[,'X.t.'][1],emaVal))
+  sesAlpha<-toInt(inpSplit('Alpha for SES e.g.(0.3,0.5): '))
+  # Replace the NA value with 0 | Only required for SES
+  df[,'X.t.'][is.na(df[,'X.t.'])]<-0
+  # Calculate the ses for the given alpha
+  sesVal<-ses(df[,'X.t.'],alpha=sesAlpha,initial = 'simple')
+  # Generate the col. name for the ses
+  sesColName<-c('SES')
+  # Extract the fitted val. and replace the very first one with NA
+  fitted<-sesVal$fitted
+  fitted[1]<-NA
+  # Update the df with the ses
+  df<-cbind(df,Temp=fitted)
   # Replace the col. names
-  colnames(df)[colnames(df)=='Temp']<-emaColName
+  colnames(df)[colnames(df)=='Temp']<-sesColName
 
   # Print the result
   cli_alert_success('Forecasted: ')
   cat('\n')
   print(df)
   cat('\n')
+
 }
-
-
 
 
 
