@@ -235,7 +235,29 @@ errAAC<-function(){
   simpRegressRes<-simpRegress()
   # Combind all the results with the original value
   tRes<-cbind(df['X.t.'],smaRes,wmaRes,expSmoothRes,simpRegressRes)
-  tRes[2:length(tRes)]-
+  # Extract the err df
+  errDf<-data.frame((tRes[2:length(tRes)]-tRes[,1])^2)
+  # Calculate the MSE and make a new df out of it
+  MSE<-t(data.frame(colMeans(errDf,na.rm = TRUE)))
+  # Update the MSE col. names with err suffix
+  colnames(MSE)<-paste(colnames(MSE),'.ERR',sep = '')
+  # Update the row names
+  rownames(MSE)<-'MSE'
+  # Calculate the err margin & and combine the MSEs with it
+  errDfFinal<-data.frame(rbind(MSE,sqrt(MSE)))
+  # Update the row name
+  rownames(errDfFinal)[2]<-'EM'
+  # Most accurate method
+  bestMethod<-colnames(errDfFinal)[which(errDfFinal[2,]==min(errDfFinal))]
+
+  # Print the result
+  cat('\n')
+  cli_alert_success('Results: ')
+  cat('\n')
+  print(errDfFinal)
+  cat('\n')
+  print(paste('Most Accurate Method:',str_remove(bestMethod, '.ERR')))
+  cat('\n')
 
 }
 
