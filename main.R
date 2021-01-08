@@ -75,7 +75,6 @@ prob_select <- function() {
 
 # Prob Type Selection of Discrete
 prob_dis_select <- function() {
-  
   prob_dis_menu <- c(
     "Less Than",
     "Less Than or Equal to",
@@ -666,7 +665,7 @@ exp_distro <- function() {
     cat("\n")
   } else if (identical(select_res, "eq")) {
     # Ask for the type of probabilities
-    prob_type <- readline(prompt = " Probability: At most: P[X ≤ x] (default) or More than: P[X > x] (>)")
+    prob_type <- readline(prompt = "Less Than / At Most (lt) | More Than / At Least (mt): ")
     # Prob type switchs
     if (identical(prob_type, "")) {
       # Read the input
@@ -689,18 +688,55 @@ exp_distro <- function() {
 }
 
 poisson_distro <- function() {
-
   # Determin type
   select_dis_res <- prob_dis_select()
 
-if (identical(select_dis_res,"lt")) {
+  if (identical(select_dis_res, "lt")) {
 
-}else if (identical(select_dis_res,"leq")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+    p <- ppois(info[1], info[2])
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(select_dis_res, "leq")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+    p <- ppois(info[1] - 1, info[2])
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(select_dis_res, "mt")) {
 
-}else if (identical(select_dis_res,"mt"))
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+    p <- ppois(info[1], info[2], lower.tail = FALSE)
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(select_dis_res, "meq")) {
+
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+    p <- ppois(info[1] - 1, info[2], lower.tail = FALSE)
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(select_dis_res, "eq")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+    p <- dpois(info[1], info[2])
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  }
+}
 
 
-}else if (identical(select_dis_res,"meq"))
+
+
+
+
 
 
 
