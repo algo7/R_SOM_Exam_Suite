@@ -75,6 +75,7 @@ prob_select <- function() {
 
 # Prob Type Selection of Discrete
 prob_dis_select <- function() {
+  
   prob_dis_menu <- c(
     "Less Than",
     "Less Than or Equal to",
@@ -692,12 +693,14 @@ poisson_distro <- function() {
   # Determin type
   select_dis_res <- prob_dis_select()
 
-if () {
+if (identical(select_dis_res,"lt")) {
 
-}
+}else if (identical(select_dis_res,"leq")) {
+
+}else if (identical(select_dis_res,"mt"))
 
 
-}
+}else if (identical(select_dis_res,"meq"))
 
 
 
