@@ -526,9 +526,6 @@ menu_list_t2 <- c(
   "Normal Distribution",
   "Exponential Distribution (Time Between Occurrences. eg.g Waiting TIme)",
   "Poisson Distribution (No. of Occurrences)",
-  "Linear Regression",
-  "Error Analysis & Accuracy Comparison",
-  "Average Daily Index [Col. No. Must be a Multiple of 7]",
   "Back"
 )
 
@@ -551,22 +548,7 @@ topic_ii <- function() {
       cat("\n")
       topic_ii()
     },
-    "4" = {
-      simp_regress(TRUE)
-      cat("\n")
-      topic_ii()
-    },
-    "5" = {
-      err_acc(TRUE)
-      cat("\n")
-      topic_ii()
-    },
-    "6" = {
-      avg_daily_index(TRUE)
-      cat("\n")
-      topic_ii()
-    },
-    "7" = topic_select()
+    "4" = topic_select()
   )
 }
 
@@ -749,6 +731,56 @@ poisson_distro <- function() {
   }
 }
 
+
+# Topic 2 (Process Analysis)
+# Main Menu List
+menu_list_t3 <- c(
+  "Normal Distribution",
+  "Exponential Distribution (Time Between Occurrences. eg.g Waiting TIme)",
+  "Poisson Distribution (No. of Occurrences)",
+  "Linear Regression",
+  "Error Analysis & Accuracy Comparison",
+  "Average Daily Index [Col. No. Must be a Multiple of 7]",
+  "Back"
+)
+
+# Topic III menu
+topic_iii <- function() {
+  choice <- menu(menu_list_t3, title = "What do you need?")
+  switch(choice,
+    "1" = {
+      norm_distro()
+      cat("\n")
+      topic_iii()
+    },
+    "2" = {
+      exp_distro()
+      cat("\n")
+      topic_iii()
+    },
+    "3" = {
+      poisson_distro()
+      cat("\n")
+      topic_iii()
+    },
+    "4" = {
+      simp_regress(TRUE)
+      cat("\n")
+      topic_iii()
+    },
+    "5" = {
+      err_acc(TRUE)
+      cat("\n")
+      topic_iii()
+    },
+    "6" = {
+      avg_daily_index(TRUE)
+      cat("\n")
+      topic_iii()
+    },
+    "7" = topic_select()
+  )
+}
 
 
 
