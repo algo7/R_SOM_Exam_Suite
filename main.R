@@ -11,9 +11,13 @@ library(TTR)
 # File import func
 file_import <- function(header) {
   # Import the file
-  filex <- file.choose()
+  # filex <- file.choose()
   # Read the file as CSV
-  x <- read.csv(file = filex, header = header)
+  # x <- read.csv(file = filex, header = header)
+  x <- read.csv(
+    file = "./examples/forecasting/forecasting.csv",
+    header = header
+  )
   return(x)
 }
 
@@ -376,7 +380,7 @@ avg_daily_index <- function(print_yes) {
       "August", "September", "October", "November", "December"
     )
     # Cal. the avg.
-    for (i in 1:length(rownames(avg_mi_mat))) {
+    for (i in seq_len(length(rownames(avg_mi_mat)))) {
       # Find the index of each re-occurring weekdays
       index <- which(df[, "Month"][exidr] == rownames(avg_mi_mat)[i])
       # Update the avg. daily index df
@@ -393,7 +397,7 @@ avg_daily_index <- function(print_yes) {
     # tem_siis longer than the df
     if (sign(l_dff) == 1) {
       l_dff <- l_dff - 1
-      temp_si <- data.frame(tempSI[, 1][- ((l_temp_si - l_dff):l_temp_si)])
+      temp_si <- data.frame(tempSI[, 1][-((l_temp_si - l_dff):l_temp_si)])
 
       # tem_siis shorter than the df
     } else if (sign(l_dff) == -1) {
@@ -415,7 +419,7 @@ avg_daily_index <- function(print_yes) {
         "Thursday", "Friday", "Saturday", "Sunday"
       )
     # Cal. the avg.
-    for (i in 1:length(rownames(avg_di_mat))) {
+    for (i in seq_len(length(rownames(avg_di_mat)))) {
       # Find the index of each re-occurring weekdays
       index <- which(df[, "Day"][exidr] == rownames(avg_di_mat)[i])
       # Update the avg. daily index df
@@ -429,7 +433,7 @@ avg_daily_index <- function(print_yes) {
     # tem_siis longer than the df
     if (sign(l_dff) == 1) {
       l_dff <- l_dff - 1
-      temp_si <- data.frame(tempSI[, 1][- ((l_temp_si - l_dff):l_temp_si)])
+      temp_si <- data.frame(tempSI[, 1][-((l_temp_si - l_dff):l_temp_si)])
       # tem_siis shorter than the df
     } else if (sign(l_dff) == -1) {
       paddings <- unlist(avg_di_mat[1])[1:abs(l_dff)]
@@ -531,7 +535,7 @@ topic_ii <- function() {
 }
 
 norm_distro <- function() {
-
+  sma_period <- to_int(inp_split("Period for SMA e.g.(3,5): "))
 }
 
 
@@ -549,7 +553,7 @@ topic_select <- function() {
   m_select <- function(topic) {
     switch(topic,
       "1" = topic_i(),
-      "2" = topicII()
+      "2" = topic_ii()
     )
   }
   m_select(choice)
