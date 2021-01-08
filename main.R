@@ -59,15 +59,17 @@ look_up <- function(val, to_compare) {
 # Prob Type Selection of Continuous Distribution
 prob_select <- function() {
   prob_menu <- c(
-    "Less Than | Less Than or Equal to",
-    "More Than | More than or Equal to",
+    "Less Than / At Most | Less Than or Equal to",
+    "More Than / At least | More than or Equal to",
+    "Between",
     "Probability to Value"
   )
   choice <- menu(prob_menu, title = "Select Relationship Type: ")
   switch(choice,
     "1" = "lt",
     "2" = "mt",
-    "3" = "eq"
+    "3" = "bt",
+    "4" = "eq"
   )
 }
 
@@ -572,22 +574,15 @@ norm_distro <- function() {
 
   # Determin type
   select_res <- prob_select()
-  # logical; if TRUE (default), probabilities are P[X ≤ x] otherwise, P[X > x].
-
-  distro_type <- readline(
-    prompt =
-      " At most: P[X ≤ x] (default) or More than: P[X > x] (>) or val2<x<val1 (bt) or prob->val (p): "
-  )
 
   if (identical(select_res, "lt")) {
+
     # Read the input
     info <- to_int(inp_split("Enter (Value,Mean,Stdev) in CSV: "))
     p <- pnorm(info[1], info[2], info[3])
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
-  } else if (identical(select_res, "leq")) {
-
   } else if (identical(select_res, "mt")) {
 
     # Read the input
@@ -596,23 +591,8 @@ norm_distro <- function() {
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
-  } else if (identical(select_res, "meq")) {
+  } else if (identical(select_res, "bt")) {
 
-  } else if (identical(select_res, "eq")) {
-
-  }
-
-  xm <- 30
-  xst <- 4
-  pnorm(21, xm, xst, lower.tail = FALSE)
-
-
-  # Determin the type of operation.
-  if (identical(distro_type, "")) {
-
-  } else if (identical(distro_type, ">")) {
-
-  } else if (identical(distro_type, "bt")) {
     # Read the input
     info <- to_int(
       inp_split("Enter (Smaller Value, Larger Value,Mean,Stdev) in CSV: ")
@@ -625,18 +605,21 @@ norm_distro <- function() {
     cat("\n")
     print(paste("The Probability is: ", p3))
     cat("\n")
-  } else if (identical(distro_type, "p")) {
+  } else if (identical(select_res, "eq")) {
+
     # Ask for the type of probabilities
-    prob_type <- readline(prompt = "Probability: At most: P[X ≤ x] (default) or More than: P[X > x] (>)")
+    prob_type <- readline(prompt = "Less Than / At Most (lt) | More Than / At Least (mt): ")
     # Prob type switchs
-    if (identical(prob_type, "")) {
+    if (identical(prob_type, "lt")) {
+
       # Read the input
       info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
       val <- qnorm(info[1], info[2], info[3])
       cat("\n")
       print(paste("The value is: ", val))
       cat("\n")
-    } else {
+    } else if (identical(prob_type, "mt")) {
+
       # Read the input
       info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
       val <- qnorm(info[1], info[2], info[3], lower.tail = FALSE)
