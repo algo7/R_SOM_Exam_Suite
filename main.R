@@ -798,8 +798,20 @@ process_analysis <- function() {
   # Calculate
   cycle_time <- sum(df[, "Time"])
   # Merging tasks does not change capacity but the waiting time for the "Customers"
+  # Adding resources increase the " Capacity" but not the "Time"
+  # Changing the time will only affect the "overall capacity" if it affects / create new bottleneck
+  # Remeber the resource type. It might not be people all the time, it can be the tools as well
   # Write to CSV
-  write.csv(df, "./optimized.csv", row.names = FALSE)
+  write.csv(df, "./calculated.csv", row.names = FALSE)
+
+  # Print the result
+  cat("\n")
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print(paste("Cycle Time:", cycle_time))
+  cat("\n")
+  print(paste("Bottleneck:", bottleneck))
+  cat("\n")
 }
 
 
