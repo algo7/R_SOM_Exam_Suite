@@ -59,13 +59,28 @@ look_up <- function(val, to_compare) {
 # Prob Type Selection of Continuous Distribution
 prob_select <- function() {
   prob_menu <- c(
+    "Less Than | Less Than or Equal to",
+    "More Than | More than or Equal to",
+    "Probability to Value"
+  )
+  choice <- menu(prob_menu, title = "Select Relationship Type: ")
+  switch(choice,
+    "1" = "lt",
+    "2" = "mt",
+    "3" = "eq"
+  )
+}
+
+# Prob Type Selection of Discrete
+prob_dis_select <- function() {
+  prob_dis_menu <- c(
     "Less Than",
     "Less Than or Equal to",
     "More Than",
     "More than or Equal to",
     "Probability to Value"
   )
-  choice <- menu(prob_menu, title = "Select Relationship Type: ")
+  choice <- menu(prob_dis_menu, title = "Select Relationship Type: ")
   switch(choice,
     "1" = "lt",
     "2" = "leq",
