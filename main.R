@@ -501,7 +501,7 @@ topic_ii <- function() {
   choice <- menu(menu_list_t2, title = "What do you need?")
   switch(choice,
     "1" = {
-      norm_distro(TRUE)
+      norm_distro()
       cat("\n")
       topic_ii()
     },
@@ -535,7 +535,48 @@ topic_ii <- function() {
 }
 
 norm_distro <- function() {
-  sma_period <- to_int(inp_split("Period for SMA e.g.(3,5): "))
+  # logical; if TRUE (default), probabilities are P[X ≤ x] otherwise, P[X > x].
+  # Determin type
+  distro_type <- readline(
+    prompt =
+      "P[X ≤ x] (default) or P[X > x] (>) or val2<x<val1 (bt) or prob->val (p): "
+  )
+
+  # Determin the type of operation.
+  if (identical(distro_type, "")) {
+    info <- to_int(inp_split("Enter (Value,Mean,Stdev) in CSV: "))
+    p <- pnorm(info[1], info[2], info[3])
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(distro_type, ">")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Value,Mean,Stdev) in CSV: "))
+    p <- pnorm(info[1], info[2], info[3], lower.tail = FALSE)
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(distro_type, "bt")) {
+    # Read the input
+    info <- to_int(
+      inp_split("Enter (Smaller Value, Larger Value,Mean,Stdev) in CSV: ")
+    )
+    # Smaller val.
+    p1 <- pnorm(info[1], info[3], info[4])
+    # Large val.
+    p2 <- pnorm(info[2], info[3], info[4])
+    p3 <- p2 - p1
+    cat("\n")
+    print(paste("The Probability is: ", p3))
+    cat("\n")
+  } else if (identical(distro_type, "p")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
+    val <- qnorm(info[1], info[2], info[3])
+    cat("\n")
+    print(paste("The value is: ", val))
+    cat("\n")
+  }
 }
 
 
