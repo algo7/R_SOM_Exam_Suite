@@ -712,14 +712,14 @@ poisson_distro <- function() {
 
     # Read the input
     info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
-    p <- ppois(info[1] + 1, info[2])
+    p <- ppois(info[1], info[2])
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
   } else if (identical(select_dis_res, "leq")) {
     # Read the input
     info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
-    p <- ppois(info[1], info[2])
+    p <- ppois(info[1] + 1, info[2])
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
