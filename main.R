@@ -488,7 +488,7 @@ avg_daily_index <- function(print_yes) {
 # Main Menu List
 menu_list_t2 <- c(
   "Normal Distribution",
-  "Weighted Moving Average",
+  "Exponential Distribution (Waiting TIme)",
   "Exponential Smoothing",
   "Linear Regression",
   "Error Analysis & Accuracy Comparison",
@@ -506,7 +506,7 @@ topic_ii <- function() {
       topic_ii()
     },
     "2" = {
-      wma_func(TRUE)
+      exp_distro()
       cat("\n")
       topic_ii()
     },
@@ -539,7 +539,7 @@ norm_distro <- function() {
   # Determin type
   distro_type <- readline(
     prompt =
-      "P[X ≤ x] (default) or P[X > x] (>) or val2<x<val1 (bt) or prob->val (p): "
+      " At most: P[X ≤ x] (default) or More than: P[X > x] (>) or val2<x<val1 (bt) or prob->val (p): "
   )
 
   # Determin the type of operation.
@@ -570,15 +570,84 @@ norm_distro <- function() {
     print(paste("The Probability is: ", p3))
     cat("\n")
   } else if (identical(distro_type, "p")) {
-    # Read the input
-    info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
-    val <- qnorm(info[1], info[2], info[3])
-    cat("\n")
-    print(paste("The value is: ", val))
-    cat("\n")
+    # Ask for the type of probabilities
+    prob_type <- readline(prompt = "Probability: At most: P[X ≤ x] (default) or More than: P[X > x] (>)")
+    # Prob type switchs
+    if (identical(prob_type, "")) {
+      # Read the input
+      info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
+      val <- qnorm(info[1], info[2], info[3])
+      cat("\n")
+      print(paste("The value is: ", val))
+      cat("\n")
+    } else {
+      # Read the input
+      info <- to_int(inp_split("Enter (Prbability,Mean,Stdev) in CSV: "))
+      val <- qnorm(info[1], info[2], info[3], lower.tail = FALSE)
+      cat("\n")
+      print(paste("The value is: ", val))
+      cat("\n")
+    }
   }
 }
 
+exp_distro <- function() {
+
+  # Determin type
+  distro_type <- readline(
+    prompt =
+      " At most: P[X ≤ x] (default) or More than: P[X > x] (>) or val2<x<val1 (bt) or prob->val (p): "
+  )
+  # Exponential distro (cal. interval) | (rate = service or product / min)
+  # Determin the type of operation.
+  if (identical(distro_type, "")) {
+    info <- to_int(inp_split("Enter (Value, Mean) in CSV: "))
+    p <- pexp(info[1], 1 / info[2]) # Less than
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(distro_type, ">")) {
+    # Read the input
+    info <- to_int(inp_split("Enter (Value, Mean) in CSV: "))
+    p <- pexp(info[1], 1 / info[2], lower.tail = FALSE) # Less than
+    cat("\n")
+    print(paste("The Probability is: ", p))
+    cat("\n")
+  } else if (identical(distro_type, "bt")) {
+    # Read the input
+    info <- to_int(
+      inp_split("Enter (Smaller Value, Larger Value, Mean) in CSV: ")
+    )
+    # Smaller val.
+    p1 <- pexp(info[1], 1 / info[3])
+    # Large val.
+    p2 <- pexp(info[2], 1 / info[3])
+    p3 <- p2 - p1
+    cat("\n")
+    print(paste("The Probability is: ", p3))
+    cat("\n")
+  } else if (identical(distro_type, "p")) {
+
+    # Ask for the type of probabilities
+    prob_type <- readline(prompt = " Probability: At most: P[X ≤ x] (default) or More than: P[X > x] (>)")
+    # Prob type switchs
+    if (identical(prob_type, "")) {
+      # Read the input
+      info <- to_int(inp_split("Enter (Prbability, Mean) in CSV: "))
+      val <- qexp(info[1], 1 / info[2])
+      cat("\n")
+      print(paste("The value is: ", val))
+      cat("\n")
+    } else {
+      # Read the input
+      info <- to_int(inp_split("Enter (Prbability, Mean) in CSV: "))
+      val <- qexp(info[1], 1 / info[2], lower.tail = FALSE)
+      cat("\n")
+      print(paste("The value is: ", val))
+      cat("\n")
+    }
+  }
+}
 
 
 
