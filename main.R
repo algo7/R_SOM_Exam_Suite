@@ -15,7 +15,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/forecasting/forecasting.csv",
+    file = "./examples/process_analysis/process_analysis.csv",
     header = header
   )
   return(x)
@@ -732,10 +732,10 @@ poisson_distro <- function() {
 }
 
 
-# Topic 2 (Process Analysis)
+# Topic 3 (Process Analysis)
 # Main Menu List
 menu_list_t3 <- c(
-  "Normal Distribution",
+  "Process Analysis",
   "Exponential Distribution (Time Between Occurrences. eg.g Waiting TIme)",
   "Poisson Distribution (No. of Occurrences)",
   "Linear Regression",
@@ -749,7 +749,7 @@ topic_iii <- function() {
   choice <- menu(menu_list_t3, title = "What do you need?")
   switch(choice,
     "1" = {
-      norm_distro()
+      process_analysis()
       cat("\n")
       topic_iii()
     },
@@ -782,6 +782,25 @@ topic_iii <- function() {
   )
 }
 
+process_analysis <- function() {
+  # Import the file
+  x <- file_import(TRUE)
+  # Convert it to df
+  df <- data.frame(x)
+  # Calculate the capacity
+  df[, "Capacity"] <- df[, "Resource"] / df[, "Time"]
+  # Unit to times the capacity by
+  capacity_fac <- to_int(inp_split("Factor to Multiply the Capacity by (60,120,1): "))
+  df[, "Capacity"] <- df[, "Capacity"] * capacity_fac
+  # The bottleneck
+  bottleneck_index <- which(df[, "Capacity"] == min(df[, "Capacity"]))
+  bottleneck <- df[, "Task.Name"][bottleneck_index]
+  # Calculate
+  cycle_time <- sum(df[, "Time"])
+  # Merging tasks does not change capacity but the waiting time for the "Customers"
+  # Write to CSV
+  write.csv(df, "./optimized.csv", row.names = FALSE)
+}
 
 
 
@@ -794,7 +813,8 @@ topic_iii <- function() {
 topic_select <- function() {
   menu_list <- c(
     "Forecasting",
-    "Probability Distribution"
+    "Probability Distribution",
+    "Process Analysis"
   )
 
   choice <- menu(menu_list, title = "Please Select A Topic:")
@@ -802,7 +822,8 @@ topic_select <- function() {
   m_select <- function(topic) {
     switch(topic,
       "1" = topic_i(),
-      "2" = topic_ii()
+      "2" = topic_ii(),
+      "3" = topic_iii()
     )
   }
   m_select(choice)
