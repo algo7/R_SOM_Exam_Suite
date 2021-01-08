@@ -683,14 +683,12 @@ exp_distro <- function() {
       cat("\n")
     }
   }
-
-  # Determin the type of operation.
 }
 
 poisson_distro <- function() {
   # Determin type
   select_dis_res <- prob_dis_select()
-
+  # Prob type switchs
   if (identical(select_dis_res, "lt")) {
 
     # Read the input
