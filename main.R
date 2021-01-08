@@ -80,7 +80,7 @@ prob_dis_select <- function() {
     "Less Than or Equal to",
     "More Than",
     "More than or Equal to",
-    "Probability to Value"
+    "Exactly Equal"
   )
   choice <- menu(prob_dis_menu, title = "Select Relationship Type: ")
   switch(choice,
@@ -635,18 +635,29 @@ exp_distro <- function() {
   # Determin type
   select_res <- prob_select()
 
+  # Custom Lambda (mean wont get divided by 1)
+  custom_lambda <- to_int(inp_split("Custom Lambda? (Yes=1, No=0): "))
+
   # Exponential distro (cal. interval) | (rate = service or product / min)
   if (identical(select_res, "lt")) {
     # Read the input
     info <- to_int(inp_split("Enter (Value, Mean) in CSV: "))
-    p <- pexp(info[1], 1 / info[2])
+    if (custom_lambda == 1) {
+      p <- pexp(info[1], info[2])
+    } else {
+      p <- pexp(info[1], 1 / info[2])
+    }
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
   } else if (identical(select_res, "mt")) {
     # Read the input
     info <- to_int(inp_split("Enter (Value, Mean) in CSV: "))
-    p <- pexp(info[1], 1 / info[2], lower.tail = FALSE) # More than
+    if (custom_lambda == 1) {
+      p <- pexp(info[1], info[2], lower.tail = FALSE)
+    } else {
+      p <- pexp(info[1], 1 / info[2], lower.tail = FALSE)
+    }
     cat("\n")
     print(paste("The Probability is: ", p))
     cat("\n")
@@ -655,11 +666,19 @@ exp_distro <- function() {
     info <- to_int(
       inp_split("Enter (Smaller Value, Larger Value, Mean) in CSV: ")
     )
-    # Smaller val.
-    p1 <- pexp(info[1], 1 / info[3])
-    # Large val.
-    p2 <- pexp(info[2], 1 / info[3])
-    p3 <- p2 - p1
+    if (custom_lambda == 1) {
+      # Smaller val.
+      p1 <- pexp(info[1], info[3])
+      # Large val.
+      p2 <- pexp(info[2], info[3])
+      p3 <- p2 - p1
+    } else {
+      # Smaller val.
+      p1 <- pexp(info[1], 1 / info[3])
+      # Large val.
+      p2 <- pexp(info[2], 1 / info[3])
+      p3 <- p2 - p1
+    }
     cat("\n")
     print(paste("The Probability is: ", p3))
     cat("\n")
