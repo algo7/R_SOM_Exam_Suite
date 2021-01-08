@@ -78,35 +78,35 @@ topic_i <- function() {
       topic_i()
     },
     "2" = {
-      wmaFunc(TRUE)
+      wma_func(TRUE)
       cat("\n")
       topic_i()
     },
     "3" = {
-      expSmoothFunc(TRUE)
+      exp_smooth_func(TRUE)
       cat("\n")
       topic_i()
     },
     "4" = {
-      simpRegress(TRUE)
+      simp_regress(TRUE)
       cat("\n")
       topic_i()
     },
     "5" = {
-      errAAC(TRUE)
+      err_acc(TRUE)
       cat("\n")
       topic_i()
     },
     "6" = {
-      avgDailyIndex(TRUE)
+      avg_daily_index(TRUE)
       cat("\n")
       topic_i()
     },
-    "7" = topicSelect()
+    "7" = topic_select()
   )
 }
 
-sma_func <- function(printYes) {
+sma_func <- function(print_yes) {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
@@ -114,7 +114,7 @@ sma_func <- function(printYes) {
   # Ask for the period to forecast
   sma_period <- to_int(inp_split("Period for SMA e.g.(3,5): "))
   # Calculate the sma for the given period
-  sma_val <- SMA(na.omit(df[, "X.t."]), n = sma_period)
+  sma_val <- TTR::SMA(na.omit(df[, "X.t."]), n = sma_period)
   # Generate the col. name for the sma
   sma_col_name <- paste("SMA.", sma_period, sep = "")
   # Update the df with the sma
@@ -122,9 +122,9 @@ sma_func <- function(printYes) {
   # Replace the col. names
   colnames(df)[colnames(df) == "Temp"] <- sma_col_name
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
-    cli_alert_success("Forecasted: ")
+    cli::cli_alert_success("Forecasted: ")
     cat("\n")
     print(df)
     cat("\n")
@@ -134,60 +134,65 @@ sma_func <- function(printYes) {
   return(df[as.character(sma_col_name)])
 }
 
-wmaFunc <- function(printYes) {
+wma_func <- function(print_yes) {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x)
   # Ask for the period to forecast
-  wmaPeriod <- to_int(inp_split("Period for WMA e.g.(3,5): "))
+  wma_period <- to_int(inp_split("Period for WMA e.g.(3,5): "))
   # Ask for the weights (must sum up to one)
-  wmaWts <- to_int(inp_split("Weights for WMA e.g.(0.3,0.5). Enter them as Given, the Program will Reverse them for You: "))
+  wma_wts <- to_int(
+    inp_split(
+      "Weights for WMA e.g.(0.3,0.5). Enter them as Given,
+      the Program will Reverse them for You: "
+    )
+  )
   # Calculate the wma for the given period
-  wmaVal <- WMA(na.omit(df[, "X.t."]), n = wmaPeriod, wts = rev(wmaWts))
+  wma_val <- TTR::WMA(na.omit(df[, "X.t."]), n = wma_period, wts = rev(wma_wts))
   # Generate the col. name for the wma
-  wmaColName <- paste("WMA.", wmaPeriod, sep = "")
+  wma_col_name <- paste("WMA.", wma_period, sep = "")
   # Update the df with the wma
-  df <- cbind(df, Temp = c(NA, wmaVal))
+  df <- cbind(df, Temp = c(NA, wma_val))
   # Replace the col. names
-  colnames(df)[colnames(df) == "Temp"] <- wmaColName
+  colnames(df)[colnames(df) == "Temp"] <- wma_col_name
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
-    cli_alert_success("Forecasted: ")
+    cli::cli_alert_success("Forecasted: ")
     cat("\n")
     print(df)
     cat("\n")
   }
 
   # Return the predicted column for error analysis
-  return(df[as.character(wmaColName)])
+  return(df[as.character(wma_col_name)])
 }
 
-expSmoothFunc <- function(printYes) {
+exp_smooth_func <- function(print_yes) {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x)
   # Ask for the alpha val.
-  sesAlpha <- to_int(inp_split("Alpha for SES e.g.(0.3,0.5): "))
+  ses_alpha <- to_int(inp_split("Alpha for SES e.g.(0.3,0.5): "))
   # Replace the NA value with 0 | Only required for SES
   df[, "X.t."][is.na(df[, "X.t."])] <- 0
   # Calculate the ses for the given alpha
-  sesVal <- ses(df[, "X.t."], alpha = sesAlpha, initial = "simple")
+  simp_es_val <- vctr::ses(df[, "X.t."], alpha = ses_alpha, initial = "simple")
   # Generate the col. name for the ses
-  sesColName <- c("SES")
+  ses_col_name <- c("SES")
   # Extract the fitted val. and replace the very first one with NA
-  fitted <- sesVal$fitted
+  fitted <- simp_es_val$fitted
   fitted[1] <- NA
   # Update the df with the ses
   df <- cbind(df, Temp = fitted)
   # Replace the col. names
-  colnames(df)[colnames(df) == "Temp"] <- sesColName
+  colnames(df)[colnames(df) == "Temp"] <- ses_col_name
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
-    cli_alert_success("Forecasted: ")
+    cli::cli_alert_success("Forecasted: ")
     cat("\n")
     print(df)
     cat("\n")
@@ -197,112 +202,126 @@ expSmoothFunc <- function(printYes) {
   return(df["SES"])
 }
 
-simpRegress <- function(printYes) {
+simp_regress <- function(print_yes) {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x)
   # Extract the time and the value columns
-  timeCol <- colnames(df["t"])
-  valCol <- colnames(df["X.t."])
+  time_col <- colnames(df["t"])
+  val_col <- colnames(df["X.t."])
   # Formula Selection Function
-  regFormSelect <- function() {
-    formlula <- character()
-    regFormMenu <- c(
-      opt1 <- paste(timeCol, "=", "a + b *", valCol),
-      opt2 <- paste(valCol, "=", "a + b *", timeCol)
+  reg_form_select <- function() {
+    reg_form_menu <- c(
+      opt1 <- paste(time_col, "=", "a + b *", val_col),
+      opt2 <- paste(val_col, "=", "a + b *", time_col)
     )
-    choice <- menu(regFormMenu, title = "Select Relationship Type: ")
+    choice <- menu(reg_form_menu, title = "Select Relationship Type: ")
     switch(choice,
-      "1" = formlula <- c(opt1, timeCol, valCol),
-      "2" = formlula <- c(opt2, valCol, timeCol)
+      "1" = formlula <- c(opt1, time_col, val_col),
+      "2" = formlula <- c(opt2, val_col, time_col)
     )
   }
-  formula <- regFormSelect()
+  formula <- reg_form_select()
   # The regression formula
-  formulaF <- as.formula(paste(formula[2], formula[3], sep = "~"))
+  formula_f <- as.formula(paste(formula[2], formula[3], sep = "~"))
   # Generate the model
-  lmod <- lm(formulaF, df)
+  lmod <- lm(formula_f, df)
   # The summary
   slmod <- summary(lmod)
   # The coefficients
   slmodc <- slmod$coefficients
   # The final formulas
-  textForm <- paste(formula[2], "=", slmodc[formula[3], "Estimate"], "*", formula[3], "+", slmodc["(Intercept)", "Estimate"])
-  varForm <-
-    paste(formula[2], "=", slmodc[formula[3], "Estimate"], "x", "+", slmodc["(Intercept)", "Estimate"])
+  text_form <- paste(
+    formula[2],
+    "=",
+    slmodc[formula[3], "Estimate"],
+    "*", formula[3], "+", slmodc["(Intercept)", "Estimate"]
+  )
+  var_form <-
+    paste(
+      formula[2],
+      "=", slmodc[formula[3], "Estimate"],
+      "x", "+", slmodc["(Intercept)", "Estimate"]
+    )
   # The predicted Values | lmod$fitted.values is missing the last value
-  predictedVals <- df["t"] * slmodc[formula[3], "Estimate"] + slmodc["(Intercept)", "Estimate"]
-  colnames(predictedVals) <- NULL
+  predicted_vals <- df["t"] *
+    slmodc[formula[3], "Estimate"] +
+    slmodc["(Intercept)", "Estimate"]
+  colnames(predicted_vals) <- NULL
   # Update the df with the LR data
-  df <- cbind(df, Temp = predictedVals)
+  df <- cbind(df, Temp = predicted_vals)
   # Replace the col. names
   colnames(df)[colnames(df) == "Temp"] <- "LR"
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
-    cli_alert_success("Forecasted: ")
+    cli::cli_alert_success("Forecasted: ")
     cat("\n")
     print(df)
     cat("\n")
-    cli_alert_info("Formulas: ")
-    print(paste("Formula (text):", textForm))
-    print(paste("Formula (variable):", varForm))
+    cli::cli_alert_info("Formulas: ")
+    print(paste("Formula (text):", text_form))
+    print(paste("Formula (variable):", var_form))
   }
 
   # Return the predicted column for error analysis
   return(df["LR"])
 }
 
-errAAC <- function(printYes) {
+err_acc <- function(print_yes) {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x)
   # Get the result of each type of prediction methods
-  smaRes <- sma_func(FALSE)
-  wmaRes <- wmaFunc(FALSE)
-  expSmoothRes <- expSmoothFunc(FALSE)
-  simpRegressRes <- simpRegress(FALSE)
+  sma_res <- sma_func(FALSE)
+  wma_res <- wma_func(FALSE)
+  exp_smooth_res <- exp_smooth_func(FALSE)
+  simp_regress_res <- simp_regress(FALSE)
   # Combind all the results with the original value
-  tRes <- cbind(df["X.t."], smaRes, wmaRes, expSmoothRes, simpRegressRes)
+  t_res <- cbind(df["X.t."], sma_res, wma_res, exp_smooth_res, simp_regress_res)
   # Extract the err df
-  errDf <- data.frame((tRes[2:length(tRes)] - tRes[, 1])^2)
-  # Calculate the MSE and make a new df out of it
-  MSE <- t(data.frame(colMeans(errDf, na.rm = TRUE)))
-  # Update the MSE col. names with err suffix
-  colnames(MSE) <- paste(colnames(MSE), ".ERR", sep = "")
+  err_df <- data.frame((t_res[2:length(t_res)] - t_res[, 1])^2)
+  # Calculate the mse_res and make a new df out of it
+  mse_res <- t(data.frame(colMeans(err_df, na.rm = TRUE)))
+  # Update the mse_res col. names with err suffix
+  colnames(mse_res) <- paste(colnames(mse_res), ".ERR", sep = "")
   # Update the row names
-  rownames(MSE) <- "MSE"
+  rownames(mse_res) <- "mse_res"
   # Calculate the err margin & and combine the MSEs with it
-  errDfFinal <- data.frame(rbind(MSE, sqrt(MSE)))
+  err_df_final <- data.frame(rbind(mse_res, sqrt(mse_res)))
   # Update the row name
-  rownames(errDfFinal)[2] <- "EM"
+  rownames(err_df_final)[2] <- "EM"
   # Most accurate method
-  bestMethod <- colnames(errDfFinal)[which(errDfFinal[2, ] == min(errDfFinal))]
+  method_selection_index <- which(err_df_final[2, ] == min(err_df_final))
+  best_method <- colnames(err_df_final)[method_selection_index]
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
     cat("\n")
-    cli_alert_success("Results: ")
+    cli::cli_alert_success("Results: ")
     cat("\n")
-    print(errDfFinal)
+    print(err_df_final)
     cat("\n")
-    print(paste("Most Accurate Method:", str_remove(bestMethod, ".ERR")))
+    print(paste(
+      "Most Accurate Method:",
+      stringr::str_remove(best_method, ".ERR")
+    ))
     cat("\n")
-    cli_alert_success("Original Result:")
-    print(tRes)
+    cli::cli_alert_success("Original Result:")
+    print(t_res)
     cat("\n")
   }
 
   # Return Err. df for analysis
-  return(errDfFinal)
+  return(err_df_final)
 }
 
-avgDailyIndex <- function(printYes) {
+avg_daily_index <- function(print_yes) {
 
   # Prediction Methods List
-  predMenu <- c(
+  pred_menu <- c(
     "Simple Moving Average",
     "Weighted Moving Average",
     "Exponential Smoothing",
@@ -310,137 +329,151 @@ avgDailyIndex <- function(printYes) {
   )
 
   # Prediction Methods Menu
-  predSelect <- function() {
-    choice <- menu(predMenu, title = "Which Method do You Want to Use?")
+  pred_select <- function() {
+    choice <- menu(pred_menu, title = "Which Method do You Want to Use?")
     switch(choice,
       "1" = return(sma_func(FALSE)),
-      "2" = return(wmaFunc(FALSE)),
-      "3" = return(expSmoothFunc(FALSE)),
-      "4" = return(simpRegress(FALSE))
+      "2" = return(wma_func(FALSE)),
+      "3" = return(exp_smooth_func(FALSE)),
+      "4" = return(simp_regress(FALSE))
     )
   }
   # Get the predicted vals from the selected optimization methods
-  predictedVal <- predSelect()
+  predicted_val <- pred_select()
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x)
   # Add the predicted result
-  df <- cbind(df, predictedVal)
+  df <- cbind(df, predicted_val)
   # Get the index of the first NA val., which indicates today / this month
-  todayIndex <- which(is.na(df[, "X.t."]))[1] - 1
+  today_index <- which(is.na(df[, "X.t."]))[1] - 1
   # Range of existing data (no forecast | current observation)
-  exiDR <- c(1:todayIndex)
+  exidr <- c(1:today_index)
   # Calculate the daily index
-  dailyIndex <- (df[, "X.t."][exiDR] - df[, "LR"][exiDR]) / df[, "LR"][exiDR]
+  daily_index <- (df[, "X.t."][exidr] - df[, "LR"][exidr]) / df[, "LR"][exidr]
   # Convert it to df
-  dailyIndex <- data.frame(dailyIndex)
+  daily_index <- data.frame(daily_index)
   # Padding
-  dailyIndex[(todayIndex + 1):length(df[, "t"]), ] <- NA
+  daily_index[(today_index + 1):length(df[, "t"]), ] <- NA
 
   # Date / Month Switch
-  monthDaySwitch <- to_int(inp_split("Is the Cycle Month=1 or Date=2: "))
+  month_day_switch <- to_int(inp_split("Is the Cycle Month=1 or Date=2: "))
 
-  if (monthDaySwitch == 1) {
-    # Bind the dailyIndex into the df & re-name the col.
-    colnames(dailyIndex) <- NULL
-    df <- cbind(df, monthlyIndex = dailyIndex)
+  if (month_day_switch == 1) {
+    # Bind the daily_index into the df & re-name the col.
+    colnames(daily_index) <- NULL
+    df <- cbind(df, monthlyIndex = daily_index)
     # Create the avg. monthly index table
-    avgMIMat <- matrix(NA, nrow = 12, ncol = 1)
+    avg_mi_mat <- matrix(NA, nrow = 12, ncol = 1)
     # Convert it to df
-    avgMIMat <- data.frame(avgMIMat)
+    avg_mi_mat <- data.frame(avg_mi_mat)
     # Assign row & col. names
-    colnames(avgMIMat) <- c("Avg.Monthly.Index")
-    rownames(avgMIMat) <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+    colnames(avg_mi_mat) <- c("Avg.Monthly.Index")
+    rownames(avg_mi_mat) <- c(
+      "January", "February",
+      "March", "April", "May", "June", "July",
+      "August", "September", "October", "November", "December"
+    )
     # Cal. the avg.
-    for (i in 1:length(rownames(avgMIMat))) {
+    for (i in 1:length(rownames(avg_mi_mat))) {
       # Find the index of each re-occurring weekdays
-      index <- which(df[, "Month"][exiDR] == rownames(avgMIMat)[i])
+      index <- which(df[, "Month"][exidr] == rownames(avg_mi_mat)[i])
       # Update the avg. daily index df
-      avgMIMat[, "Avg.Monthly.Index"][i] <- mean(df[, "monthlyIndex"][index])
+      avg_mi_mat[, "Avg.Monthly.Index"][i] <- mean(df[, "monthlyIndex"][index])
     }
     # Cal. LR+SI
-    tempSI <- data.frame(rep.int(unlist(avgMIMat[1]), ceiling(length(df[, 1]) / 12)))
+    temp_si <- data.frame(rep.int(
+      unlist(avg_mi_mat[1]),
+      ceiling(length(df[, 1]) / 12)
+    ))
     # Calculate the length diff
-    lTempSI <- length(tempSI[, 1])
-    lDiff <- lTempSI - length(df[, "t"])
-    # tempSI is longer than the df
-    if (sign(lDiff) == 1) {
-      lDiff <- lDiff - 1
-      tempSI <- data.frame(tempSI[, 1][-((lTempSI - lDiff):lTempSI)])
+    l_temp_si <- length(tempSI[, 1])
+    l_dff <- l_temp_si - length(df[, "t"])
+    # tem_siis longer than the df
+    if (sign(l_dff) == 1) {
+      l_dff <- l_dff - 1
+      temp_si <- data.frame(tempSI[, 1][- ((l_temp_si - l_dff):l_temp_si)])
 
-      # tempSI is shorter than the df
-    } else if (sign(lDiff) == -1) {
-      paddings <- unlist(avgMIMat[1])[1:abs(lDiff)]
-      tempSI[lTempSI:length(df[, "t"]), ] <- as.numeric(paddings)
+      # tem_siis shorter than the df
+    } else if (sign(l_dff) == -1) {
+      paddings <- unlist(avg_mi_mat[1])[1:abs(l_dff)]
+      tempSI[l_temp_si:length(df[, "t"]), ] <- as.numeric(paddings)
     }
-    # tempSI[(todayIndex+1):length(df[,'t']),] <- NA
   } else {
-    # Bind the dailyIndex into the df
-    df <- cbind(df, dailyIndex)
+    # Bind the daily_index into the df
+    df <- cbind(df, daily_index)
     # Create the avg. daily index table
-    avgDIMat <- matrix(NA, nrow = 7, ncol = 1)
+    avg_di_mat <- matrix(NA, nrow = 7, ncol = 1)
     # Convert it to df
-    avgDIMat <- data.frame(avgDIMat)
+    avg_di_mat <- data.frame(avg_di_mat)
     # Assign row & col. names
-    colnames(avgDIMat) <- c("Avg.Daily.Index")
-    rownames(avgDIMat) <-
-      c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    colnames(avg_di_mat) <- c("Avg.Daily.Index")
+    rownames(avg_di_mat) <-
+      c(
+        "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday", "Sunday"
+      )
     # Cal. the avg.
-    for (i in 1:length(rownames(avgDIMat))) {
+    for (i in 1:length(rownames(avg_di_mat))) {
       # Find the index of each re-occurring weekdays
-      index <- which(df[, "Day"][exiDR] == rownames(avgDIMat)[i])
+      index <- which(df[, "Day"][exidr] == rownames(avg_di_mat)[i])
       # Update the avg. daily index df
-      avgDIMat[, "Avg.Daily.Index"][i] <- mean(df[, "dailyIndex"][index])
+      avg_di_mat[, "Avg.Daily.Index"][i] <- mean(df[, "daily_index"][index])
     }
     # Cal. LR+SI
-    tempSI <- data.frame(rep.int(unlist(avgDIMat[1]), length(df[, 1]) / 7))
+    temp_si <- data.frame(rep.int(unlist(avg_di_mat[1]), length(df[, 1]) / 7))
     # Calculate the length diff
-    lTempSI <- length(tempSI[, 1])
-    lDiff <- lTempSI - length(df[, "t"])
-    # tempSI is longer than the df
-    if (sign(lDiff) == 1) {
-      lDiff <- lDiff - 1
-      tempSI <- data.frame(tempSI[, 1][-((lTempSI - lDiff):lTempSI)])
-      # tempSI is shorter than the df
-    } else if (sign(lDiff) == -1) {
-      paddings <- unlist(avgDIMat[1])[1:abs(lDiff)]
-      tempSI[lTempSI:length(df[, "t"]), ] <- as.numeric(paddings)
+    l_temp_si <- length(tempSI[, 1])
+    l_dff <- l_temp_si - length(df[, "t"])
+    # tem_siis longer than the df
+    if (sign(l_dff) == 1) {
+      l_dff <- l_dff - 1
+      temp_si <- data.frame(tempSI[, 1][- ((l_temp_si - l_dff):l_temp_si)])
+      # tem_siis shorter than the df
+    } else if (sign(l_dff) == -1) {
+      paddings <- unlist(avg_di_mat[1])[1:abs(l_dff)]
+      tempSI[l_temp_si:length(df[, "t"]), ] <- as.numeric(paddings)
     }
   }
 
   colnames(tempSI) <- NULL
   # Bind the SI into the df
-  df <- cbind(df, tempSI = tempSI)
+  df <- cbind(df, temp_si = tempSI)
   # Calculate LR+SI
   df[, "tempSI"] <- df[, "LR"] + df[, "LR"] * df[, "tempSI"]
   # Replace the col. names
   colnames(df)[colnames(df) == "tempSI"] <- "LR+SI"
-  # Cal. MSE till last observation
-  mseLR <- (df[, "LR"][exiDR] - df[, "X.t."][exiDR])^2
-  mseLRSI <- (df[, "LR+SI"][exiDR] - df[, "X.t."][exiDR])^2
+  # Cal. mse_res till last observation
+  mse_lr <- (df[, "LR"][exidr] - df[, "X.t."][exidr])^2
+  mse_lr_si <- (df[, "LR+SI"][exidr] - df[, "X.t."][exidr])^2
   # Convert to dfs
-  mseLR <- data.frame(mseLR)
-  mseLRSI <- data.frame(mseLRSI)
+  mse_lr <- data.frame(mse_lr)
+  mse_lr_si <- data.frame(mse_lr_si)
   # Bind them all
-  tMSE <- cbind(mseLR, mseLRSI)
+  t_mse <- cbind(mse_lr, mse_lr_si)
   # Cal. ME as well
-  errDf <- rbind(colMeans(tMSE), sqrt(colMeans(tMSE)))
+  err_df <- rbind(colMeans(t_mse), sqrt(colMeans(t_mse)))
   # Update the row name
-  rownames(errDf) <- c("MSE", "ME")
+  rownames(err_df) <- c("mse_res", "ME")
   # Most accurate method
-  bestMethod <- colnames(errDf)[which(errDf[2, ] == min(errDf))]
+  best_method <- colnames(err_df)[which(err_df[2, ] == min(err_df))]
 
-  if (printYes == TRUE) {
+  if (print_yes == TRUE) {
     # Print the result
     cat("\n")
-    cli_alert_success("Results: ")
+    cli::cli_alert_success("Results: ")
     cat("\n")
-    print(errDf)
+    print(err_df)
     cat("\n")
-    print(paste("Most Accurate Method:", str_remove(bestMethod, ".ERR")))
+    print(
+      paste(
+        "Most Accurate Method:",
+        stringr::str_remove(best_method, ".ERR")
+      )
+    )
     cat("\n")
-    cli_alert_success("Original Result:")
+    cli::cli_alert_success("Original Result:")
     print(df)
     cat("\n")
   }
@@ -449,7 +482,7 @@ avgDailyIndex <- function(printYes) {
 
 # Topic 2 (Probability Distribution)
 # Main Menu List
-menuListT2 <- c(
+menu_list_t2 <- c(
   "Normal Distribution",
   "Weighted Moving Average",
   "Exponential Smoothing",
@@ -460,44 +493,44 @@ menuListT2 <- c(
 )
 
 # Topic II menu
-topic_i <- function() {
-  choice <- menu(menuListT2, title = "What do you need?")
+topic_ii <- function() {
+  choice <- menu(menu_list_t2, title = "What do you need?")
   switch(choice,
     "1" = {
-      normDistro(TRUE)
+      norm_distro(TRUE)
       cat("\n")
-      topicII()
+      topic_ii()
     },
     "2" = {
-      wmaFunc(TRUE)
+      wma_func(TRUE)
       cat("\n")
-      topic_i()
+      topic_ii()
     },
     "3" = {
-      expSmoothFunc(TRUE)
+      exp_smooth_func(TRUE)
       cat("\n")
-      topicII()
+      topic_ii()
     },
     "4" = {
-      simpRegress(TRUE)
+      simp_regress(TRUE)
       cat("\n")
-      topicII()
+      topic_ii()
     },
     "5" = {
-      errAAC(TRUE)
+      err_acc(TRUE)
       cat("\n")
-      topic_i()
+      topic_ii()
     },
     "6" = {
-      avgDailyIndex(TRUE)
+      avg_daily_index(TRUE)
       cat("\n")
-      topicII()
+      topic_ii()
     },
-    "7" = topicSelect()
+    "7" = topic_select()
   )
 }
 
-normDistro <- function() {
+norm_distro <- function() {
 
 }
 
@@ -505,20 +538,20 @@ normDistro <- function() {
 
 
 # Main Menu Selection Function
-topicSelect <- function() {
-  menuList <- c(
+topic_select <- function() {
+  menu_list <- c(
     "Forecasting",
     "Probability Distribution"
   )
 
-  choice <- menu(menuList, title = "Please Select A Topic:")
+  choice <- menu(menu_list, title = "Please Select A Topic:")
   # Menu Selection Function
-  mSelect <- function(topic) {
+  m_select <- function(topic) {
     switch(topic,
       "1" = topic_i(),
       "2" = topicII()
     )
   }
-  mSelect(choice)
+  m_select(choice)
 }
-topicSelect()
+topic_select()
