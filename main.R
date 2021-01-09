@@ -807,17 +807,17 @@ topic_iv <- function() {
 
 waiting_lines <- function() {
   # Load workbook
-  wb <- openxls::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
+  wb <- openxlsx::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
   # Ask for Arrival rate: λ, Service rate: μ = 60, Service Point Count = 1 (mm1), 2 (mmk)
   params <- to_int(inp_split("Enter Arrival rate = λ, Service rate = μ, Service Point Count = n (e.g. 60,20,2): "))
   # Arrival rate: λ
-  openxls::writeData(wb, "mmk", params[1], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  openxlsx::writeData(wb, "mmk", params[1], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
   # Service rate: μ = 60,
-  openxls::writeData(wb, "mmk", params[2], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  openxlsx::writeData(wb, "mmk", params[2], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
   # Service Point Count = 1 (mm1), 2 (mmk)
-  openxls::writeData(wb, "mmk", params[3], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  openxlsx::writeData(wb, "mmk", params[3], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
   # Update the workbook
-  openxls::saveWorkbook(wb, "./examples/waiting_lines/mmk.xlsx", overwrite = TRUE)
+  openxlsx::saveWorkbook(wb, "./examples/waiting_lines/mmk.xlsx", overwrite = TRUE)
 
   # Print the result
   cat("\n")
@@ -837,7 +837,8 @@ topic_select <- function() {
   menu_list <- c(
     "Forecasting",
     "Probability Distribution",
-    "Process Analysis"
+    "Process Analysis",
+    "Waiting Line"
   )
 
   choice <- menu(menu_list, title = "Please Select A Topic:")
@@ -846,7 +847,8 @@ topic_select <- function() {
     switch(topic,
       "1" = topic_i(),
       "2" = topic_ii(),
-      "3" = topic_iii()
+      "3" = topic_iii(),
+      "4" = topic_iv()
     )
   }
   m_select(choice)
