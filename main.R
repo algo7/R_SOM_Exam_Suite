@@ -852,6 +852,32 @@ waiting_lines <- function() {
   cat("\n")
 }
 
+# Topic 5 (Control Charts)
+# Main Menu List
+menu_list_t5 <- c(
+  "X-Chart [Average]",
+  "P-Chart [Proportion]"
+  "Back",
+)
+
+# Topic IV menu
+topic_v <- function() {
+  choice <- menu(menu_list_t5, title = "What do you need?")
+  switch(choice,
+    "1" = {
+      x_chart()
+      cat("\n")
+      topic_v()
+    },
+     "2" = {
+      p_chart()
+      cat("\n")
+      topic_v()
+    },
+    "3" = topic_select()
+  )
+}
+
 
 
 
