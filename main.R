@@ -808,9 +808,8 @@ topic_iv <- function() {
 waiting_lines <- function() {
   # Load workbook
   wb <- XLConnect::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
-  # xxa <- XLConnect::readWorksheet(wb, "mmk")
   # Ask for Arrival rate: λ, Service rate: μ = 60, Service Point Count = 1 (mm1), 2 (mmk)
-  params <- to_int(inp_split("Enter Arrival rate = λ, Service rate = μ, Service Point Count = n (e.g. 60,20,2): "))
+  params <- to_int(inp_split("Enter Arrival rate = λ, Service rate = μ, Service Point Count = k (e.g. 60,20,2): "))
   # Arrival rate: λ
   XLConnect::writeWorksheet(wb, "mmk", data = params[1], startCol = 2, startRow = 2, header = FALSE)
   # Service rate: μ = 60,
@@ -819,13 +818,17 @@ waiting_lines <- function() {
   XLConnect::writeWorksheet(wb, "mmk", data = params[3], startCol = 2, startRow = 4, header = FALSE)
   # Force formula recalculation
   XLConnect::setForceFormulaRecalculation(wb, sheet = 1, TRUE)
-  # Update the workbook
+  # Read the workbook for the recalculation to take place
+  temp <- XLConnect::readWorksheet(wb, "mmk")
+  temp <- temp # Avoid linter warning of unused var
+  # Update the workbook on the disk
   XLConnect::saveWorkbook(wb, "./examples/waiting_lines/mmk1.xlsx")
   # Load the updated workbook
   df <- openxlsx::loadWorkbook("./examples/waiting_lines/mmk1.xlsx")
   df <- openxlsx:::readWorkbook(df)
   # Subset to get the mmk table
   mmk_table <- df[15:length(df[, 1]), 1:8, drop = FALSE]
+  mmk_table <- mmk_table[, -3] # Remove the 3 col. which is empty
   # Get the calculated result for various params along with the description
   params_res <- df[4:11, 1:3, drop = FALSE]
 
