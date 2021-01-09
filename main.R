@@ -4,6 +4,7 @@ library(cli)
 library(stringr)
 library(lpSolve)
 library(TTR)
+library(openxlsx)
 
 
 # Misc.:
@@ -104,7 +105,7 @@ menu_list_t1 <- c(
   "Exponential Smoothing",
   "Linear Regression",
   "Error Analysis & Accuracy Comparison",
-  "Average Daily Index [Col. No. Must be a Multiple of 7]",
+  "Average Daily Index",
   "Back"
 )
 
@@ -736,11 +737,6 @@ poisson_distro <- function() {
 # Main Menu List
 menu_list_t3 <- c(
   "Process Analysis",
-  "Exponential Distribution (Time Between Occurrences. eg.g Waiting TIme)",
-  "Poisson Distribution (No. of Occurrences)",
-  "Linear Regression",
-  "Error Analysis & Accuracy Comparison",
-  "Average Daily Index [Col. No. Must be a Multiple of 7]",
   "Back"
 )
 
@@ -753,32 +749,7 @@ topic_iii <- function() {
       cat("\n")
       topic_iii()
     },
-    "2" = {
-      exp_distro()
-      cat("\n")
-      topic_iii()
-    },
-    "3" = {
-      poisson_distro()
-      cat("\n")
-      topic_iii()
-    },
-    "4" = {
-      simp_regress(TRUE)
-      cat("\n")
-      topic_iii()
-    },
-    "5" = {
-      err_acc(TRUE)
-      cat("\n")
-      topic_iii()
-    },
-    "6" = {
-      avg_daily_index(TRUE)
-      cat("\n")
-      topic_iii()
-    },
-    "7" = topic_select()
+    "2" = topic_select()
   )
 }
 
@@ -814,7 +785,47 @@ process_analysis <- function() {
   cat("\n")
 }
 
+# Topic 4 (Waiting Lines)
+# Main Menu List
+menu_list_t4 <- c(
+  "Process Analysis",
+  "Back"
+)
 
+# Topic IV menu
+topic_iv <- function() {
+  choice <- menu(menu_list_t3, title = "What do you need?")
+  switch(choice,
+    "1" = {
+      waiting_lines()
+      cat("\n")
+      topic_iv()
+    },
+    "2" = topic_select()
+  )
+}
+
+waiting_lines <- function() {
+  # Load workbook
+  wb <- openxls::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
+  # Ask for Arrival rate: λ, Service rate: μ = 60, Service Point Count = 1 (mm1), 2 (mmk)
+  params <- to_int(inp_split("Enter Arrival rate = λ, Service rate = μ, Service Point Count = n (e.g. 60,20,2): "))
+  # Arrival rate: λ
+  openxls::writeData(wb, "mmk", params[1], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  # Service rate: μ = 60,
+  openxls::writeData(wb, "mmk", params[2], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  # Service Point Count = 1 (mm1), 2 (mmk)
+  openxls::writeData(wb, "mmk", params[3], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  # Update the workbook
+  openxls::saveWorkbook(wb, "./examples/waiting_lines/mmk.xlsx", overwrite = TRUE)
+
+  # Print the result
+  cat("\n")
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print("Open the excel file in /examples/waiting_lines/mmk.xlsx for the updated results")
+  cat("\n")
+}
 
 
 

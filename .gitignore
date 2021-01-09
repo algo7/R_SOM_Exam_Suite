@@ -37,3 +37,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+main.R
+examples/waiting_lines/.~lock.mmk.xlsx#
+.~lock.*
