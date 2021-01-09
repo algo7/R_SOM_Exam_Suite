@@ -856,7 +856,7 @@ waiting_lines <- function() {
 # Main Menu List
 menu_list_t5 <- c(
   "X-Chart [Average]",
-  "P-Chart [Proportion]"
+  "P-Chart [Proportion]",
   "Back",
 )
 
@@ -869,7 +869,7 @@ topic_v <- function() {
       cat("\n")
       topic_v()
     },
-     "2" = {
+    "2" = {
       p_chart()
       cat("\n")
       topic_v()
