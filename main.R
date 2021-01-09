@@ -6,7 +6,7 @@ library(lpSolve)
 library(TTR)
 library(openxlsx)
 library(XLConnect)
-
+library(qicharts2)
 # Misc.:
 
 # File import func
