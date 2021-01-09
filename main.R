@@ -829,8 +829,14 @@ waiting_lines <- function() {
   # Subset to get the mmk table
   mmk_table <- df[15:length(df[, 1]), 1:8, drop = FALSE]
   mmk_table <- mmk_table[, -3] # Remove the 3 col. which is empty
+  # Set the col. names for the mmk table
+  mmk_col_name <- mmk_table[1, ]
+  mmk_col_name[2] <- "X" # Replace the NA val.
+  colnames(mmk_table) <- mmk_col_name
+  mmk_table <- mmk_table[-1, ] # Remove the 1 row which is set as the col. names already
   # Get the calculated result for various params along with the description
   params_res <- df[4:11, 1:3, drop = FALSE]
+
 
   # Print the result
   cat("\n")
@@ -841,6 +847,8 @@ waiting_lines <- function() {
   cat("\n")
   print("MMK Table:")
   print(mmk_table)
+  cat("\n")
+  print("Resource in the Quque = Total People - People at the Service Point")
   cat("\n")
 }
 
