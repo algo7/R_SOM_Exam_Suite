@@ -794,7 +794,7 @@ menu_list_t4 <- c(
 
 # Topic IV menu
 topic_iv <- function() {
-  choice <- menu(menu_list_t3, title = "What do you need?")
+  choice <- menu(menu_list_t4, title = "What do you need?")
   switch(choice,
     "1" = {
       waiting_lines()
