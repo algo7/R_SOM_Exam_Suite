@@ -5,7 +5,7 @@ library(stringr)
 library(lpSolve)
 library(TTR)
 library(openxlsx)
-
+library(XLConnect)
 
 # Misc.:
 
@@ -788,7 +788,7 @@ process_analysis <- function() {
 # Topic 4 (Waiting Lines)
 # Main Menu List
 menu_list_t4 <- c(
-  "Process Analysis",
+  "MMK Table",
   "Back"
 )
 
@@ -807,23 +807,36 @@ topic_iv <- function() {
 
 waiting_lines <- function() {
   # Load workbook
-  wb <- openxlsx::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
+  wb <- XLConnect::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
   # Ask for Arrival rate: λ, Service rate: μ = 60, Service Point Count = 1 (mm1), 2 (mmk)
   params <- to_int(inp_split("Enter Arrival rate = λ, Service rate = μ, Service Point Count = n (e.g. 60,20,2): "))
   # Arrival rate: λ
-  openxlsx::writeData(wb, "mmk", params[1], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  XLConnect::writeWorksheet(wb, "mmk", data = params[1], startCol = 2, startRow = 2, header = FALSE)
   # Service rate: μ = 60,
-  openxlsx::writeData(wb, "mmk", params[2], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  XLConnect::writeWorksheet(wb, "mmk", data = params[2], startCol = 2, startRow = 3, header = FALSE)
   # Service Point Count = 1 (mm1), 2 (mmk)
-  openxlsx::writeData(wb, "mmk", params[3], startCol = 2, startRow = 2, rowNames = FALSE, colNames = FALSE)
+  XLConnect::writeWorksheet(wb, "mmk", data = params[3], startCol = 2, startRow = 4, header = FALSE)
+  # Force formula recalculation
+  XLConnect::setForceFormulaRecalculation(wb, "mmk", TRUE)
   # Update the workbook
-  openxlsx::saveWorkbook(wb, "./examples/waiting_lines/mmk.xlsx", overwrite = TRUE)
+  XLConnect::saveWorkbook(wb, "./examples/waiting_lines/mmk.xlsx", overwrite = TRUE)
+  # Load the updated workbook
+  df <- XLConnect::loadWorkbook("./examples/waiting_lines/mmk.xlsx")
+  df <- XLConnect::readWorkbook(df)
+  # Subset to get the mmk table
+  mmk_table <- df[15:length(df[, 1]), 1:8, drop = FALSE]
+  # Get the calculated result for various params along with the description
+  params_res <- df[4:11, 1:3, drop = FALSE]
 
   # Print the result
   cat("\n")
-  cli::cli_alert_success("Results: ")
+  cli::cli_alert_success("Solutions: ")
   cat("\n")
-  print("Open the excel file in /examples/waiting_lines/mmk.xlsx for the updated results")
+  print("Calculated Results:")
+  print(params_res)
+  cat("\n")
+  print("MMK Table:")
+  print(mmk_table)
   cat("\n")
 }
 
