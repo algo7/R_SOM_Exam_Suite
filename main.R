@@ -848,7 +848,7 @@ waiting_lines <- function() {
   print("MMK Table:")
   print(mmk_table)
   cat("\n")
-  print("Resource in the Quque = Total People - People at the Service Point")
+  print("Resource in the Queue = Total People - People at the Service Point")
   cat("\n")
 }
 
