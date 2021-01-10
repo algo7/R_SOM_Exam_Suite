@@ -6,6 +6,8 @@ library(lpSolve)
 library(TTR)
 library(openxlsx)
 library(XLConnect)
+library(ggplot2)
+library(hrbrthemes)
 
 # Misc.:
 # File import func
@@ -885,7 +887,8 @@ x_chart <- function() {
   # Ask for the a2 value
   a2_val <- to_int(inp_split("Enter the A2 Value: "))
   # Get X double bar (population mean)
-  x_db_bar <- mean(colMeans(df))
+  col_means <- colMeans(df)
+  x_db_bar <- mean(col_means)
   # Get R bar (average of population range)
   # Get min & max of each col.
   col_range <- data.frame(lapply(df, range))
@@ -896,6 +899,33 @@ x_chart <- function() {
   # Calculate the UCL (upper control limit)
   ucl <- x_db_bar + a2_val * r_bar
   # Calculate the LCL (lower control limit)
+  lcl <- x_db_bar - a2_val * r_bar
+  # Plot the data
+  x_axis <- seq(1, length(colnames(df)), 1)
+  y_axis <- unlist(col_means)
+  x_chart_plot_data <- ggplot(as.data.frame(col_means), aes(x_axis, y_axis)) +
+    geom_line(aes(group = 1, color = "Mean"), size = 2) +
+    geom_hline(aes(group = 1, color = "X_DB_BAR", yintercept = x_db_bar), linetype = "dashed", size = 2) +
+    geom_hline(aes(group = 1, color = "UCL", yintercept = ucl), linetype = "dashed", size = 2) +
+    geom_hline(aes(group = 1, color = "LCL", yintercept = lcl), linetype = "dashed", size = 2) +
+    # The colors of the value are mapped in alphabetical orders in terms of the legend names
+    scale_colour_manual(name = "Type:", values = c("Red", "Black", "Green", "Yellow")) +
+    ggtitle("X-Chart") +
+    labs(y = NULL, x = NULL) +
+    theme_bw()
+  print(x_chart_plot_data)
+  # Print the result
+  cat("\n")
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print(paste("X_DOUBLE_BAR:", x_db_bar))
+  cat("\n")
+  print(paste("R_BAR:", r_bar))
+  cat("\n")
+  print(paste("UCL:", ucl))
+  cat("\n")
+  print(paste("LCL:", lcl))
+  cat("\n")
 }
 
 
@@ -914,7 +944,8 @@ topic_select <- function() {
     "Forecasting",
     "Probability Distribution",
     "Process Analysis",
-    "Waiting Line"
+    "Waiting Line",
+    "Control Chart"
   )
 
   choice <- menu(menu_list, title = "Please Select A Topic:")
@@ -924,7 +955,8 @@ topic_select <- function() {
       "1" = topic_i(),
       "2" = topic_ii(),
       "3" = topic_iii(),
-      "4" = topic_iv()
+      "4" = topic_iv(),
+      "5" = topic_v()
     )
   }
   m_select(choice)
