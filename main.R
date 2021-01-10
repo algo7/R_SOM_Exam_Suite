@@ -945,6 +945,31 @@ p_chart <- function() {
   ucl <- p_bar + 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
   # Calculate LCL
   lcl <- p_bar - 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
+  # Plot the data
+  x_axis <- seq(1, length(colnames(df)), 1)
+  y_axis <- unlist(col_means)
+  p_chart_plot_data <- ggplot(as.data.frame(col_means), aes(x_axis, y_axis)) +
+    geom_line(aes(group = 1, color = "Mean"), size = 2) +
+    geom_hline(aes(group = 1, color = "X_DB_BAR", yintercept = x_db_bar), linetype = "dashed", size = 2) +
+    geom_hline(aes(group = 1, color = "UCL", yintercept = ucl), linetype = "dashed", size = 2) +
+    geom_hline(aes(group = 1, color = "LCL", yintercept = lcl), linetype = "dashed", size = 2) +
+    # The colors of the value are mapped in alphabetical orders in terms of the legend names
+    scale_colour_manual(name = "Type:", values = c("Red", "Black", "Green", "Yellow")) +
+    ggtitle("X-Chart") +
+    labs(y = NULL, x = NULL) +
+    theme_bw()
+  print(p_chart_plot_data)
+
+  # Print the result
+  cat("\n")
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print(paste("P_BAR:", p_bar))
+  cat("\n")
+  print(paste("UCL:", ucl))
+  cat("\n")
+  print(paste("LCL:", lcl))
+  cat("\n")
 }
 
 
