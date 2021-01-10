@@ -17,7 +17,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/control_charts/x_charts.csv",
+    file = "./examples/control_charts/y_charts.csv",
     header = header
   )
   return(x)
@@ -930,7 +930,10 @@ x_chart <- function() {
 
 
 p_chart <- function() {
-
+  # Import the file
+  x <- file_import(TRUE)
+  # Convert it to df
+  df <- data.frame(x, row.names = 1)
 }
 
 
