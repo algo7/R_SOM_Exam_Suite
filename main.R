@@ -935,7 +935,7 @@ p_chart <- function() {
   # Convert it to df
   df <- data.frame(x)
   # Ask for the n value (sample size)
-  sample_szie <- to_int(inp_split("Enter Sample Size (n): "))
+  sample_szie <- to_int(inp_split("Enter the Sample Size (n): "))
   # Calculate the incorrect %
   incorrect_percentage <- df[, 2] / sample_szie
   df <- cbind(df, Percentage = incorrect_percentage)
@@ -946,20 +946,32 @@ p_chart <- function() {
   # Calculate LCL
   lcl <- p_bar - 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
   # Plot the data
-  x_axis <- seq(1, length(colnames(df)), 1)
-  y_axis <- unlist(col_means)
-  p_chart_plot_data <- ggplot(as.data.frame(col_means), aes(x_axis, y_axis)) +
-    geom_line(aes(group = 1, color = "Mean"), size = 2) +
-    geom_hline(aes(group = 1, color = "X_DB_BAR", yintercept = x_db_bar), linetype = "dashed", size = 2) +
+  x_axis <- seq(1, length(rownames(df)), 1)
+  p_chart_plot_data <- ggplot(df[, "Percentage", drop = FALSE], aes(x_axis, incorrect_percentage)) +
+    geom_line(aes(group = 1, color = "Incorrect Percentage"), size = 2) +
+    geom_hline(aes(group = 1, color = "P_BAR", yintercept = p_bar), linetype = "dashed", size = 2) +
     geom_hline(aes(group = 1, color = "UCL", yintercept = ucl), linetype = "dashed", size = 2) +
     geom_hline(aes(group = 1, color = "LCL", yintercept = lcl), linetype = "dashed", size = 2) +
-    # The colors of the value are mapped in alphabetical orders in terms of the legend names
-    scale_colour_manual(name = "Type:", values = c("Red", "Black", "Green", "Yellow")) +
-    ggtitle("X-Chart") +
+    ggtitle("P-Chart") +
     labs(y = NULL, x = NULL) +
     theme_bw()
-  print(p_chart_plot_data)
 
+  # Is there a set limit for comparison?
+  if_limit <- readline(prompt = "Is there a set limit for comparison? (y/n): ")
+  if (identical(if_limit, "y")) {
+    # Ask for the limit value
+    limit_val <- to_int(inp_split("Enter the Limit Value (e.g. 0.2,0.5): "))
+    # Update the plot obj
+    p_chart_plot_data <- p_chart_plot_data +
+      geom_hline(aes(group = 1, color = "Limit", yintercept = limit_val), linetype = "dashed", size = 2) +
+      scale_colour_manual(name = "Type:", values = c("Black", "Red", "Purple", "Yellow", "Green"))
+    print(p_chart_plot_data)
+  } else {
+    p_chart_plot_data <- p_chart_plot_data +
+      # The colors of the value are mapped in alphabetical orders in terms of the legend names
+      scale_colour_manual(name = "Type:", values = c("Black", "Red", "Yellow", "Green"))
+    print(p_chart_plot_data)
+  }
   # Print the result
   cat("\n")
   cli::cli_alert_success("Results: ")
