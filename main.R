@@ -933,7 +933,12 @@ p_chart <- function() {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
-  df <- data.frame(x, row.names = 1)
+  df <- data.frame(x)
+  # Ask for the n value (sample size)
+  sample_szie <- to_int(inp_split("Enter Sample Size (n): "))
+  # Calculate the incorrect %
+  incorrect_percentage <- df[, 2] / sample_szie
+  df <- cbind(df, Percentage = incorrect_percentage)
 }
 
 
