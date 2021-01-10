@@ -6,9 +6,8 @@ library(lpSolve)
 library(TTR)
 library(openxlsx)
 library(XLConnect)
-library(qicharts2)
-# Misc.:
 
+# Misc.:
 # File import func
 file_import <- function(header) {
   # Import the file
@@ -16,7 +15,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/process_analysis/process_analysis.csv",
+    file = "./examples/control_charts/x_charts.csv",
     header = header
   )
   return(x)
@@ -857,7 +856,7 @@ waiting_lines <- function() {
 menu_list_t5 <- c(
   "X-Chart [Average]",
   "P-Chart [Proportion]",
-  "Back",
+  "Back"
 )
 
 # Topic IV menu
@@ -876,6 +875,20 @@ topic_v <- function() {
     },
     "3" = topic_select()
   )
+}
+
+x_chart <- function() {
+  # Import the file
+  x <- file_import(TRUE)
+  # Convert it to df
+  df <- data.frame(x, row.names = 1)
+  # Ask for the a2 value
+  a2_val <- to_int(inp_split("Enter the A2 Value: "))
+  # Get X double bar (population mean)
+  mean(colMeans(df))
+}
+p_chart <- function() {
+
 }
 
 
