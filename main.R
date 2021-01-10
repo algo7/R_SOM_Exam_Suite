@@ -17,7 +17,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/control_charts/y_charts.csv",
+    file = "./examples/control_charts/y_charts_1.csv",
     header = header
   )
   return(x)
@@ -932,22 +932,58 @@ x_chart <- function() {
 p_chart <- function() {
   # Import the file
   x <- file_import(TRUE)
-  # Convert it to df
-  df <- data.frame(x)
   # Ask for the n value (sample size)
   sample_szie <- to_int(inp_split("Enter the Sample Size (n): "))
-  # Calculate the incorrect %
-  incorrect_percentage <- df[, 2] / sample_szie
-  df <- cbind(df, Percentage = incorrect_percentage)
-  # Calculate P bar (avg. of all the incorrect percentages)
-  p_bar <- colMeans(df[, "Percentage", drop = FALSE])
+  # Does the data need extra calculation?
+  inc_count <- readline(prompt = "Is the Count of Inccorecct Occurrences Given? (y/n): ")
+  if (identical(inc_count, "n")) {
+    # Convert it to df
+    df <- data.frame(x, row.names = 1)
+    row_names <- rownames(df)
+    df <- data.frame(lapply(df, as.numeric))
+    # Re-assign the row names
+    rownames(df) <- row_names
+    # Ask for the incorrect measurement standard
+    mes_std <- to_int(inp_split("Enter the Measurement Standard (e.g. 4, 0.6): "))
+    # Ask for the incorrect measurement condition
+    mes_cond <- readline(prompt = "Enter the Measurement Condition [<,>,<=,>=,=]: ")
+    # Switch
+    if (identical(mes_cond, "<")) {
+      df <- ifelse(df < mes_std, 1, 0)
+    } else if (identical(mes_cond, ">")) {
+      df <- ifelse(df > mes_std, 1, 0)
+    } else if (identical(mes_cond, "<=")) {
+      df <- ifelse(df <= mes_std, 1, 0)
+    } else if (identical(mes_cond, ">=")) {
+      df <- ifelse(df >= mes_std, 1, 0)
+    } else if (identical(mes_cond, "=")) {
+      df <- ifelse(df == mes_std, 1, 0)
+    }
+    # Calculate the incorrect %
+    incorrect_percentage <- colMeans(df)
+    # Calculate P bar (avg. of all the incorrect percentages)
+    p_bar <- mean(incorrect_percentage)
+    # X-axis
+    x_axis <- seq(1, length(colnames(df)), 1)
+  } else {
+    # Convert it to df
+    df <- data.frame(x)
+    # Calculate the incorrect %
+    incorrect_percentage <- df[, 2] / sample_szie
+    # Update the df
+    df <- cbind(df, Percentage = incorrect_percentage)
+    # Calculate P bar (avg. of all the incorrect percentages)
+    p_bar <- colMeans(df[, "Percentage", drop = FALSE])
+    # X-axis
+    x_axis <- seq(1, length(rownames(df)), 1)
+  }
+
   # Calculate UCL
   ucl <- p_bar + 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
   # Calculate LCL
   lcl <- p_bar - 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
   # Plot the data
-  x_axis <- seq(1, length(rownames(df)), 1)
-  p_chart_plot_data <- ggplot(df[, "Percentage", drop = FALSE], aes(x_axis, incorrect_percentage)) +
+  p_chart_plot_data <- ggplot(data.frame(incorrect_percentage), aes(x_axis, incorrect_percentage)) +
     geom_line(aes(group = 1, color = "Incorrect Percentage"), size = 2) +
     geom_hline(aes(group = 1, color = "P_BAR", yintercept = p_bar), linetype = "dashed", size = 2) +
     geom_hline(aes(group = 1, color = "UCL", yintercept = ucl), linetype = "dashed", size = 2) +
