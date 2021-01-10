@@ -17,7 +17,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/control_charts/y_charts_1.csv",
+    file = "./examples/control_charts/x_charts_1.csv",
     header = header
   )
   return(x)
