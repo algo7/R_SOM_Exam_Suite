@@ -941,6 +941,8 @@ p_chart <- function() {
   df <- cbind(df, Percentage = incorrect_percentage)
   # Calculate P bar (avg. of all the incorrect percentages)
   p_bar <- colMeans(df[, "Percentage", drop = FALSE])
+  # Calculate UCL
+  ucl <- p_bar + 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
 }
 
 
