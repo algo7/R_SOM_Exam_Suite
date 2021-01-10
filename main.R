@@ -885,8 +885,20 @@ x_chart <- function() {
   # Ask for the a2 value
   a2_val <- to_int(inp_split("Enter the A2 Value: "))
   # Get X double bar (population mean)
-  mean(colMeans(df))
+  x_db_bar <- mean(colMeans(df))
+  # Get R bar (average of population range)
+  # Get min & max of each col.
+  col_range <- data.frame(lapply(df, range))
+  # Get the range of each
+  col_range <- col_range[2, ] - col_range[1, ]
+  # Calculate the mean of all of ranges
+  r_bar <- mean(unlist(col_range))
+  # Calculate the UCL (upper control limit)
+  ucl <- x_db_bar + a2_val * r_bar
+  # Calculate the LCL (lower control limit)
 }
+
+
 p_chart <- function() {
 
 }
