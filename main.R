@@ -943,6 +943,8 @@ p_chart <- function() {
   p_bar <- colMeans(df[, "Percentage", drop = FALSE])
   # Calculate UCL
   ucl <- p_bar + 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
+  # Calculate LCL
+  lcl <- p_bar - 3 * sqrt(p_bar * (1 - p_bar) / sample_szie)
 }
 
 
