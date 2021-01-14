@@ -1066,8 +1066,20 @@ inv_constant() <- function() {
   df.1["CT", ] <- df.1["DOY", ] / df.1["DQ", ]
   # Calculate the management cost
   df.1["MC", ] <- df.1["L", ] * (df.1["D", ] / df.1["EQQ", ]) + df.1["H", ] * df.1["C", ] * (df.1["EQQ", ] / 2)
-  # Calculate the reorder pointer
+  # Calculate the reorder point
   df.1["RP", ] <- df.1["RLT", ] * df.1["DS", ]
+  # Ask if the lead time varies
+  lt_v <- to_int(inp_split("Does the Lead Times Vary [Yes=1,No=0]: "))
+  # Determine if the lead time varies
+  if (identical(lt_v, 1)) {
+    lt_v_d <- to_int(inp_split("How Many Days e.g 2 : "))
+    lt_v_d <- seq(1, lt_v_d, 1)
+    lt_v_p <- to_int(inp_split("Enter THE Probability for Each Day in CSV (e.g. 0.1,0.2): "))
+    # The lead time probability table
+    ltpt <- data.frame(t(rbind(Lead.Time = lt_v_d, Prob = lt_v_p)))
+    data.frame(ltpt, Comulated.Prob = 0, Demand.During.Lead.Time = 0)
+    # Calculate the cumulative prob.
+  }
 }
 
 
