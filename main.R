@@ -1163,7 +1163,6 @@ inv_var <- function() {
   cat("\n")
   print(paste("Safety Stock: ", sft_stock))
   cat("\n")
-  cli::cli_alert_warning("Remember the Unit ")
 }
 
 
