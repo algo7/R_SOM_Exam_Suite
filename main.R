@@ -44,6 +44,8 @@ to_cha <- function(list) {
     return(int)
   }
 }
+# Disable scientific notation
+options(scipen = 999)
 
 # Custom lookup func(same as excel lookup)
 # Get the value that's smaller or equal to and closest to the input val
@@ -1054,11 +1056,14 @@ inv_constant() <- function() {
   # Subset the df to get pure numerical value with the code being the row namespace
   pre.df <- df[, seq_len(length(colnames(df)))]
   df.1 <- data.frame(pre.df, row.names = 1)
-  ## Remove NAs
-  df.1 <- df.1[ , colSums(is.na(df.1)) == 0]
+  # Remove NAs
+  df.1 <- df.1[, colSums(is.na(df.1)) == 0, drop = FALSE]
   # Calculate EQQ
-  df.1["EQQ",] <- (2 * df.1["L", ] * df.1["D", ] / df.1["H", ] * df.1["C", ])
-  
+  df.1["EQQ", ] <- sqrt(2 * df.1["L", ] * df.1["D", ] / (df.1["H", ] * df.1["C", ]))
+  # Calculate the order per year
+  df.1["DQ", ] <- df.1["D", ] / df.1["EQQ", ]
+  # Calculate the cycle time
+  df.1["CT", ] <- df.1["DOY", ] / df.1["DQ", ]
 }
 
 
