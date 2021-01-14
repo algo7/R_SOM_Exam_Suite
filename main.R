@@ -1149,6 +1149,23 @@ inv_constant <- function() {
   }
 }
 
+inv_var <- function() {
+  # Ask for the related params
+  info <- to_int(inp_split("Enter the Service Level, Mean, Stdev: "))
+  # Re-order point
+  r_point <- ceiling(qnorm(info[1], info[2], info[3]))
+  # Calculate the safety stock
+  sft_stock <- r_point - (info[2])
+
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print(paste("Re-order Point: ", r_point))
+  cat("\n")
+  print(paste("Safety Stock: ", sft_stock))
+  cat("\n")
+  cli::cli_alert_warning("Remember the Unit ")
+}
+
 
 
 # Main Menu Selection Function

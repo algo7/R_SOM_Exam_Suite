@@ -1,7 +1,7 @@
 Description,Code,Item,Item-2,Item-3
-Annual Demand,D,1700,,
+Annual Demand,D,7800,,
 Order Cost,L,20,,
-Cost per Unit,C,12,,
+Cost per Unit,C,18,,
 Holding Cost Percentage,H,0.1,,
 Days Open Per Year,DOY,250,,
 Order Lead Time,RLT,3,,
