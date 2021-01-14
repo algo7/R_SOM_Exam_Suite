@@ -1068,13 +1068,16 @@ inv_constant() <- function() {
   df.1["MC", ] <- df.1["L", ] * (df.1["D", ] / df.1["EQQ", ]) + df.1["H", ] * df.1["C", ] * (df.1["EQQ", ] / 2)
   # Calculate the reorder point
   df.1["RP", ] <- df.1["RLT", ] * df.1["DS", ]
+  # Update the initial df with df.1
+  df[, 2:length(colnames(df))] <- df.1
   # Ask if the lead time varies
   lt_v <- to_int(inp_split("Does the Lead Times Vary [Yes=1,No=0]: "))
   # Determine if the lead time varies
   if (identical(lt_v, 1)) {
     lt_v_d <- to_int(inp_split("How Many Days e.g 2 : "))
     lt_v_d <- seq(1, lt_v_d, 1)
-    lt_v_p <- to_int(inp_split("Enter THE Probability for Each Day in CSV (e.g. 0.1,0.2): "))
+    lt_v_p <- to_int(inp_split("Enter the Probability for Each Day in CSV (e.g. 0.1,0.2): "))
+    s_rate <- to_int(inp_split("Enter the service Rate (e.g. 0.9): "))
     # The lead time probability table
     ltpt <- data.frame(t(rbind(Lead.Time = lt_v_d, Prob = lt_v_p)))
     ltpt <- data.frame(ltpt, Cumulative.Prob = 0, Demand.During.Lead.Time = 0)
@@ -1090,7 +1093,28 @@ inv_constant() <- function() {
     ltpt[, "Demand.During.Lead.Time"] <- df.1["DS", ][1] * ltpt[, "Lead.Time"]
     # Calculate the average demand during the lead time
     avg_demand_dlt <- sum(ltpt[, "Prob"] * ltpt[, "Demand.During.Lead.Time"])
+    # Find the index for the service level
+    sr_rate_index <- which(ltpt[, "Cumulative.Prob"] == s_rate)
+    # Calculate the safety stock
+    sft_stock <- ltpt[, "Demand.During.Lead.Time"][sr_rate_index] - avg_demand_dlt
+
+    # Print the result
+    cat("\n")
+    cli::cli_alert_success("Results: ")
+    cat("\n")
+    print(df)
+    cat("\n")
+    print(paste("Average Demand During Lead Time: ", avg_demand_dlt))
+    cat("\n")
+    print(paste("Safety Stock at Service Level", s_rate, ":", sft_stock))
   }
+
+  # Print the result
+  cat("\n")
+  cli::cli_alert_success("Results: ")
+  cat("\n")
+  print(df)
+  cat("\n")
 }
 
 
