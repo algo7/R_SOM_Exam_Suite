@@ -1062,22 +1062,29 @@ inv_constant <- function() {
   df.1["EOQ", ] <- sqrt(2 * df.1["L", ] * df.1["D", ] / (df.1["H", ] * df.1["C", ]))
   # Calculate the management cost
   df.1["MC", ] <- df.1["L", ] * (df.1["D", ] / df.1["EOQ", ]) + df.1["H", ] * df.1["C", ] * (df.1["EOQ", ] / 2)
+  # Calculate the purchasing cost
+  df.1["PC", ] <- df.1["C", ] * df.1["D", ]
+  # Calculate the ordering cost
+  df.1["OC", ] <- df.1["L", ] * df.1["D", ] / df.1["EOQ", ]
+  # Calculate the holding cost
+  df.1["HC", ] <- df.1["H", ] * df.1["C", ] * (ceiling(df.1["EOQ", ]) / 2)
 
-  # Custom
-  custom_eqq <- to_int(inp_split("Custom EQQs? [Yes=1,No=0]: "))
-  if (identical(custom_eqq, 1)) {
+  # Custom EOQs
+  custom_eoq <- to_int(inp_split("Custom EOQs? [Yes=1,No=0]: "))
+  if (identical(custom_eoq, 1)) {
     print(df.1)
-    custom_eqqs <- to_int(inp_split("Enter Custom EQQs in order in CSV: "))
-    df.1["EOQ", ] <- custom_eqqs
+    custom_eoqs <- to_int(inp_split("Enter Custom EQQs in order in CSV: "))
+    df.1["EOQ", ] <- custom_eoqs
   }
   # Calculate the total cost
   df.1["TC", ] <- (df.1["L", ] * df.1["D", ] / df.1["EOQ", ]) + (df.1["H", ] * df.1["C", ] * df.1["EOQ", ] / 2) + (df.1["C", ] * df.1["D", ])
+  # Calculate the order per year
+  df.1["DQ", ] <- df.1["D", ] / df.1["EOQ", ]
 
   # Determine if further info is required e.g cycle time
   more_info <- to_int(inp_split("Is EQQ Enough? [Yes=1,No=0]: "))
   if (identical(more_info, 0)) {
-    # Calculate the order per year
-    df.1["DQ", ] <- df.1["D", ] / df.1["EOQ", ]
+
     # Calculate the cycle time
     df.1["CT", ] <- df.1["DOY", ] / df.1["DQ", ]
     # Calculate the reorder point
