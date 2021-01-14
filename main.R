@@ -1088,6 +1088,8 @@ inv_constant() <- function() {
     }
     # Calculate the demand during lead time
     ltpt[, "Demand.During.Lead.Time"] <- df.1["DS", ][1] * ltpt[, "Lead.Time"]
+    # Calculate the average demand during the lead time
+    avg_demand_dlt <- sum(ltpt[, "Prob"] * ltpt[, "Demand.During.Lead.Time"])
   }
 }
 
