@@ -14,7 +14,7 @@ library(hrbrthemes)
 file_import <- function(header) {
   # Import the file
   # filex <- file.choose()
-  # Read the file as CSV
+  # # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
     file = "./examples/inventory_management/inv_mgmt.csv",
@@ -1048,7 +1048,7 @@ topic_vi <- function() {
   )
 }
 
-inv_constant() <- function() {
+inv_constant <- function() {
   # Import the file
   x <- file_import(TRUE)
   # Convert it to df
@@ -1062,8 +1062,16 @@ inv_constant() <- function() {
   df.1["EOQ", ] <- sqrt(2 * df.1["L", ] * df.1["D", ] / (df.1["H", ] * df.1["C", ]))
   # Calculate the management cost
   df.1["MC", ] <- df.1["L", ] * (df.1["D", ] / df.1["EOQ", ]) + df.1["H", ] * df.1["C", ] * (df.1["EOQ", ] / 2)
+
+  # Custom
+  custom_eqq <- to_int(inp_split("Custom EQQs? [Yes=1,No=0]: "))
+  if (identical(custom_eqq, 1)) {
+    print(df.1)
+    custom_eqqs <- to_int(inp_split("Enter Custom EQQs in order in CSV: "))
+    df.1["EOQ", ] <- custom_eqqs
+  }
   # Calculate the total cost
-  df.1["TC", ] <- (df.1["L", ] * df.1["D", ] / df.1["EOQ", ]) + (df.1["H", ] * df.1["C", ] * df.1["EOQ", ] / 2) + df.1["C", ] + df.1["D", ]
+  df.1["TC", ] <- (df.1["L", ] * df.1["D", ] / df.1["EOQ", ]) + (df.1["H", ] * df.1["C", ] * df.1["EOQ", ] / 2) + (df.1["C", ] * df.1["D", ])
 
   # Determine if further info is required e.g cycle time
   more_info <- to_int(inp_split("Is EQQ Enough? [Yes=1,No=0]: "))
