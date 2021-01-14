@@ -1107,14 +1107,14 @@ inv_constant() <- function() {
     print(paste("Average Demand During Lead Time: ", avg_demand_dlt))
     cat("\n")
     print(paste("Safety Stock at Service Level", s_rate, ":", sft_stock))
+  } else {
+    # Print the result
+    cat("\n")
+    cli::cli_alert_success("Results: ")
+    cat("\n")
+    print(df)
+    cat("\n")
   }
-
-  # Print the result
-  cat("\n")
-  cli::cli_alert_success("Results: ")
-  cat("\n")
-  print(df)
-  cat("\n")
 }
 
 
