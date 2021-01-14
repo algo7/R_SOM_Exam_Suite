@@ -1020,6 +1020,31 @@ p_chart <- function() {
   cat("\n")
 }
 
+# Topic 6 (Inventory Management)
+# Main Menu List
+menu_list_t6 <- c(
+  "Constant Demand",
+  "Variable Demand",
+  "Back"
+)
+
+# Topic VI menu
+topic_vi <- function() {
+  choice <- menu(menu_list_t6, title = "What do you need?")
+  switch(choice,
+    "1" = {
+      inv_constant()
+      cat("\n")
+      topic_vi()
+    },
+    "2" = {
+      inv_var()
+      cat("\n")
+      topic_vi()
+    },
+    "3" = topic_select()
+  )
+}
 
 
 
@@ -1032,7 +1057,8 @@ topic_select <- function() {
     "Probability Distribution",
     "Process Analysis",
     "Waiting Line",
-    "Control Chart"
+    "Control Chart",
+    "Inventory Management"
   )
 
   choice <- menu(menu_list, title = "Please Select A Topic:")
@@ -1043,7 +1069,8 @@ topic_select <- function() {
       "2" = topic_ii(),
       "3" = topic_iii(),
       "4" = topic_iv(),
-      "5" = topic_v()
+      "5" = topic_v(),
+      "6" = topic_vi()
     )
   }
   m_select(choice)
