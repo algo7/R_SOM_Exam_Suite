@@ -1064,6 +1064,10 @@ inv_constant() <- function() {
   df.1["DQ", ] <- df.1["D", ] / df.1["EQQ", ]
   # Calculate the cycle time
   df.1["CT", ] <- df.1["DOY", ] / df.1["DQ", ]
+  # Calculate the management cost
+  df.1["MC", ] <- df.1["L", ] * (df.1["D", ] / df.1["EQQ", ]) + df.1["H", ] * df.1["C", ] * (df.1["EQQ", ] / 2)
+  # Calculate the reorder pointer
+  df.1["RP", ] <- df.1["RLT", ] * df.1["DS", ]
 }
 
 
