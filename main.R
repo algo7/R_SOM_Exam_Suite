@@ -1086,6 +1086,8 @@ inv_constant() <- function() {
         ltpt[, "Cumulative.Prob"][i + 1] <- ltpt[, "Cumulative.Prob"][i] + ltpt[, "Prob"][i + 1]
       }
     }
+    # Calculate the demand during lead time
+    ltpt[, "Demand.During.Lead.Time"] <- df.1["DS", ][1] * ltpt[, "Lead.Time"]
   }
 }
 
