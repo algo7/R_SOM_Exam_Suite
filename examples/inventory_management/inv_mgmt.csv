@@ -1,13 +1,14 @@
-Description,Code,Item,Item-2,Item-3
-Annual Demand,D,37500,,
-Order Cost,L,12,,
-Cost per Unit,C,1.5,,
-Holding Cost Percentaage,H,0.18,,
-Days Open Per Year,DOY,250,,
-Order Lead Time,RLT,3,,
-Daily Sales,DS,150,,
-Economic Order Quantity,EQQ,0,,
-Order per Year,DQ,0,,
-Cycle Time,CT,0,,
-Management Cost,MC,0,,
-Reorder Point,RP,0,,
+Description,Code,Item
+Annual Demand,D,37500
+Order Cost,L,12
+Cost per Unit,C,1.5
+Holding Cost Percentage,H,0.18
+Days Open Per Year,DOY,250
+Order Lead Time,RLT,3
+Daily Sales,DS,150
+Economic Order Quantity,EOQ,0
+Order per Year,DQ,0
+Cycle Time,CT,0
+Total Cost,TC,0
+Management Cost,MC,0
+Reorder Point,RP,0
