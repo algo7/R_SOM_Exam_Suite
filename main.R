@@ -9,17 +9,18 @@ library(XLConnect)
 library(ggplot2)
 library(hrbrthemes)
 
+
 # Misc.:
 # File import func
 file_import <- function(header) {
   # Import the file
-  # filex <- file.choose()
-  # # Read the file as CSV
-  # x <- read.csv(file = filex, header = header)
-  x <- read.csv(
-    file = "./examples/inventory_management/inv_mgmt.csv",
-    header = header
-  )
+  filex <- file.choose()
+  # Read the file as CSV
+  x <- read.csv(file = filex, header = header)
+  # x <- read.csv(
+  #   file = "./examples/inventory_management/inv_mgmt.csv",
+  #   header = header
+  # )
   return(x)
 }
 
@@ -223,7 +224,7 @@ exp_smooth_func <- function(print_yes) {
   # Replace the NA value with 0 | Only required for SES
   df[, "X.t."][is.na(df[, "X.t."])] <- 0
   # Calculate the ses for the given alpha
-  simp_es_val <- vctr::ses(df[, "X.t."], alpha = ses_alpha, initial = "simple")
+  simp_es_val <- ses(df[, "X.t."], alpha = ses_alpha, initial = "simple")
   # Generate the col. name for the ses
   ses_col_name <- c("SES")
   # Extract the fitted val. and replace the very first one with NA
@@ -698,6 +699,7 @@ poisson_distro <- function() {
 
     # Read the input
     info <- to_int(inp_split("Enter (Value, Lambda) in CSV: "))
+
     p <- ppois(info[1], info[2])
     cat("\n")
     print(paste("The Probability is: ", p))
@@ -886,9 +888,10 @@ x_chart <- function() {
   x <- file_import(TRUE)
   # Convert it to df
   df <- data.frame(x, row.names = 1)
-  # Ask for the a2 value
+  -# Ask for the a2 value
   a2_val <- to_int(inp_split("Enter the A2 Value: "))
   # Get X double bar (population mean)
+df <- t(df)
   col_means <- colMeans(df)
   x_db_bar <- mean(col_means)
   # Get R bar (average of population range)

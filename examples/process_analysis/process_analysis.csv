@@ -1,5 +1,8 @@
 Task-No.,Task-Name,Time,Resource-Type,Resource,Capacity
-1,Order taking . Payment .Drink service,80,Person,2,
-2,Steak cooking,180,Tool,9,
-3,Assembling the hamburger,60,Person,2,
-4,Service of the hamburger,60,Person,3,
+1,Extract.ice,12,Harvester,5,
+2,Trasnport.Ice,60,Drone,19,
+3,Melting.Ince,5,Oven,2,
+4,Extract.snad,8,Filter,3,
+5,Desal.Water,16,Desal,8,
+6,Virus.test,30,AutoLab,10,
+7,botti.water,15,Filling,7,

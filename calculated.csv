@@ -1,0 +1,8 @@
+"Task.No.","Task.Name","Time","Resource.Type","Resource","Capacity"
+1,"Extract.ice",12,"Harvester",5,0.416666666666667
+2,"Trasnport.Ice",60,"Drone",19,0.316666666666667
+3,"Melting.Ince",5,"Oven",2,0.4
+4,"Extract.snad",8,"Filter",3,0.375
+5,"Desal.Water",16,"Desal",8,0.5
+6,"Virus.test",30,"AutoLab",10,0.333333333333333
+7,"botti.water",15,"Filling",7,0.466666666666667
