@@ -17,7 +17,7 @@ file_import <- function(header) {
   # Read the file as CSV
   # x <- read.csv(file = filex, header = header)
   x <- read.csv(
-    file = "./examples/control_charts/x_charts_1.csv",
+    file = "./examples/inventory_management/inv_mgmt.csv",
     header = header
   )
   return(x)
@@ -1046,7 +1046,20 @@ topic_vi <- function() {
   )
 }
 
-
+inv_constant() <- function() {
+  # Import the file
+  x <- file_import(TRUE)
+  # Convert it to df
+  df <- data.frame(x, row.names = 1)
+  # Subset the df to get pure numerical value with the code being the row namespace
+  pre.df <- df[, seq_len(length(colnames(df)))]
+  df.1 <- data.frame(pre.df, row.names = 1)
+  ## Remove NAs
+  df.1 <- df.1[ , colSums(is.na(df.1)) == 0]
+  # Calculate EQQ
+  df.1["EQQ",] <- (2 * df.1["L", ] * df.1["D", ] / df.1["H", ] * df.1["C", ])
+  
+}
 
 
 

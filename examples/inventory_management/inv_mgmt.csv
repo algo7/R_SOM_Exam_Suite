@@ -1,5 +1,6 @@
-Description,Code,Item,Item-2
-Annual Demand,D,,
-Order Cost,L,,
-Cost per Unit,C,,
-Holding Cost Percentaage,H,,
+Description,Code,Item,Item-2,Item-3
+Annual Demand,D,1,2,
+Order Cost,L,1,2,
+Cost per Unit,C,1,2,
+Holding Cost Percentaage,H,1,2,
+Economic Order Quantity,EQQ,0,0,
