@@ -1077,8 +1077,15 @@ inv_constant() <- function() {
     lt_v_p <- to_int(inp_split("Enter THE Probability for Each Day in CSV (e.g. 0.1,0.2): "))
     # The lead time probability table
     ltpt <- data.frame(t(rbind(Lead.Time = lt_v_d, Prob = lt_v_p)))
-    data.frame(ltpt, Comulated.Prob = 0, Demand.During.Lead.Time = 0)
+    ltpt <- data.frame(ltpt, Cumulative.Prob = 0, Demand.During.Lead.Time = 0)
+    # Fill in the first prob.
+    ltpt[, "Cumulative.Prob"][1] <- ltpt[, "Prob"][1]
     # Calculate the cumulative prob.
+    for (i in seq_len(length(rownames(ltpt)))) {
+      if (!is.na(ltpt[, "Cumulative.Prob"][i + 1])) {
+        ltpt[, "Cumulative.Prob"][i + 1] <- ltpt[, "Cumulative.Prob"][i] + ltpt[, "Prob"][i + 1]
+      }
+    }
   }
 }
 
